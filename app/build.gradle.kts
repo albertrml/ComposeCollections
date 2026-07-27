@@ -66,7 +66,7 @@ dependencies {
 }
 
 group = "br.com.arml"
-version = "0.1.0"
+version = "0.1.1"
 
 publishing {
     publications {
@@ -77,7 +77,30 @@ publishing {
 
             groupId = "br.com.arml.composecollections"
             artifactId = "composecollections"
-            version = "0.1.0"
+            version = "0.1.1"
+
+            pom {
+                name.set("ComposeCollections")
+                description.set("Componentes Compose para exibição de grandes coleções de dados com navegação rápida.")
+                url.set("https://github.com/albertrml/ComposeCollections")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://opensource.org/licenses/MIT")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("albertrml")
+                        name.set("Alberto")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:github.com/albertrml/ComposeCollections.git")
+                    developerConnection.set("scm:git:ssh://github.com/albertrml/ComposeCollections.git")
+                    url.set("https://github.com/albertrml/ComposeCollections/tree/main")
+                }
+            }
         }
     }
     repositories {
