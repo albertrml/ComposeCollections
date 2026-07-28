@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-07-28
+
+### Changed
+- **Refactoring**: Improved `QuickNavList` architecture using a template-based pattern for better reuse.
+- **API Evolution**: Components now support custom labels and content descriptions via `QuickNavLabels`.
+
+### Fixed
+- **UI Transitions**: Replaced abrupt navigation button visibility changes with smooth `AnimatedVisibility` (fade + expansion).
+- **UX**: Refined scroll visibility logic to be more responsive, showing return buttons as soon as the list leaves the start position.
+
+### Added
+- **Theming**: Introduced `QuickNavTheme` (powered by `CompositionLocal`) for global configuration of icons, labels, and transitions.
+
 ## [0.1.1] - 2026-07-27
 
 ### Fixed
