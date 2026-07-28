@@ -3,18 +3,19 @@
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/albertrml/composecollections)
 ![License](https://img.shields.io/github/license/albertrml/composecollections)
 
-A biblioteca fornece componentes Compose para exibição de grandes coleções de dados com navegação rápida, indicadores de posição e comportamento consistente entre listas, grids e containers roláveis.
+A biblioteca fornece componentes Compose para exibição de grandes coleções de dados com navegação rápida, indicadores de posição e comportamento consistente entre listas e containers roláveis.
 
 ## 🚀 Visão Geral
 
-O **ComposeCollections** foca em melhorar a experiência de navegação em listas longas no Jetpack Compose, oferecendo a API **QuickNav** que facilita o deslocamento rápido através de botões de ação inteligentes.
+O **ComposeCollections** foca em melhorar a experiência de navegação em listas longas no Jetpack Compose, oferecendo a API **QuickNav** que facilita o deslocamento rápido através de botões de ação inteligentes e transições suaves.
 
 ## ✨ Recursos
 
-*   **QuickNavList**: Uma `LazyColumn` aprimorada com botões para saltar diretamente para o **topo** ou para o **final** da lista.
-*   **PagedQuickNavList**: Uma versão que navega por **páginas**, rolando a quantidade exata de itens que estão sendo exibidos na tela no momento.
-*   **Customização**: Controle total sobre o estado da lista (`LazyListState`), alinhamento e espaçamento.
-*   **Smart Visibility**: Os botões de navegação aparecem e desaparecem automaticamente baseados na posição atual do scroll.
+*   **EdgedList**: Uma `LazyColumn` aprimorada com botões para saltar diretamente para o **início** ou para o **fim** da lista.
+*   **PagedList**: Uma versão que navega por **páginas**, rolando exatamente a quantidade de itens visíveis na tela.
+*   **Smart Visibility**: Botões de navegação inteligentes que aparecem/desaparecem baseados na posição do scroll.
+*   **Animações Suaves**: Transições fluidas de entrada e saída para os controles de navegação.
+*   **Altamente Customizável**: Suporte total a temas e internacionalização.
 
 ## 📦 Instalação
 
@@ -52,7 +53,7 @@ dependencies {
 
 ### Navegação de Extremos (Início/Fim)
 ```kotlin
-QuickNavList(modifier = Modifier.fillMaxSize()) {
+EdgedList(modifier = Modifier.fillMaxSize()) {
     items(myData) { item ->
         Text(item.name)
     }
@@ -61,10 +62,38 @@ QuickNavList(modifier = Modifier.fillMaxSize()) {
 
 ### Navegação por Páginas
 ```kotlin
-PagedQuickNavList(modifier = Modifier.fillMaxSize()) {
+PagedList(modifier = Modifier.fillMaxSize()) {
     items(myData) { item ->
         Text(item.name)
     }
+}
+```
+
+## 🎨 Customização e Temas
+
+A partir da versão **0.1.2**, você pode customizar globalmente rótulos, ícones e animações usando o `QuickNavTheme`.
+
+### Tradução de Rótulos
+```kotlin
+val customLabels = QuickNavLabelDefaults.edgedLabels().copy(
+    previousLabel = "Voltar ao Início",
+    nextLabel = "Ir para o Fim"
+)
+
+QuickNavTheme(labels = customLabels) {
+    EdgedList { /* ... */ }
+}
+```
+
+### Troca de Ícones
+```kotlin
+val customIcons = QuickNavIconDefaults.default.copy(
+    upIcon = Icons.Filled.ArrowUpward,
+    downIcon = Icons.Filled.ArrowDownward
+)
+
+QuickNavTheme(icons = customIcons) {
+    PagedList { /* ... */ }
 }
 ```
 
@@ -74,4 +103,4 @@ Contribuições são bem-vindas! Se você encontrar um bug ou tiver uma ideia pa
 
 ## 📄 Licença
 
-Este projeto está licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICENSE.md) para mais detalhes.
+Este projeto está licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
