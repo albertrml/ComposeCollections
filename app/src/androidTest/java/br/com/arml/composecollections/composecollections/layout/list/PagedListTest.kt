@@ -1,4 +1,4 @@
-package br.com.arml.composecollections.layout
+package br.com.arml.composecollections.composecollections.layout.list
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListState
@@ -13,7 +13,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import br.com.arml.composecollections.composecollections.layout.PagedQuickNavList
 import br.com.arml.composecollections.R
 import org.junit.Before
 import org.junit.Rule
@@ -21,13 +20,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class PagedQuickNavListTest {
+class PagedListTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private lateinit var pagedQuickNavListTag: String
-    private lateinit var pagedQuickNavListUpButtonTag: String
-    private lateinit var pagedQuickNavListDownButtonTag: String
+    private lateinit var pagedListTag: String
+    private lateinit var pagedListPreviousButtonTag: String
+    private lateinit var pagedListNextButtonTag: String
 
     private val items = List(100) { "Item $it" }
     private val shortedList = List(5) { "Item $it" }
@@ -35,15 +34,15 @@ class PagedQuickNavListTest {
     @Before
     fun setup() {
         InstrumentationRegistry.getInstrumentation().targetContext.apply {
-            pagedQuickNavListTag = getString(R.string.pagedQuickNavList_component_testTag)
-            pagedQuickNavListUpButtonTag = getString(R.string.pagedQuickNavList_upButton_testTag)
-            pagedQuickNavListDownButtonTag = getString(R.string.pagedQuickNavList_downButton_testTag)
+            pagedListTag = getString(R.string.pagedQuickNavList_component_testTag)
+            pagedListPreviousButtonTag = getString(R.string.pagedQuickNavList_upButton_testTag)
+            pagedListNextButtonTag = getString(R.string.pagedQuickNavList_downButton_testTag)
         }
     }
 
-    private fun pagedQuickNavListContent(list: List<String> = items) {
+    private fun pagedListContent(list: List<String> = items) {
         composeTestRule.setContent {
-            PagedQuickNavList {
+            PagedList {
                 items(list) { item ->
                     Text(text = item, modifier = Modifier.fillMaxWidth())
                 }
@@ -52,41 +51,41 @@ class PagedQuickNavListTest {
     }
 
     @Test
-    fun pagedQuickNavList_shouldNotShowsButtons_whenAllItemIsOnScreen() {
-        pagedQuickNavListContent(shortedList)
+    fun pagedList_shouldNotShowsButtons_whenAllItemIsOnScreen() {
+        pagedListContent(shortedList)
         composeTestRule.apply {
-            onNodeWithTag(pagedQuickNavListTag).assertExists()
-            onNodeWithTag(pagedQuickNavListDownButtonTag).assertIsNotDisplayed()
-            onNodeWithTag(pagedQuickNavListUpButtonTag).assertIsNotDisplayed()
+            onNodeWithTag(pagedListTag).assertExists()
+            onNodeWithTag(pagedListNextButtonTag).assertIsNotDisplayed()
+            onNodeWithTag(pagedListPreviousButtonTag).assertIsNotDisplayed()
             shortedList.forEach { onNodeWithText(it).assertIsDisplayed() }
         }
     }
 
     @Test
-    fun pagedQuickNavList_shouldShowsDownButton_whenAllItemIsNotOnScreen() {
-        pagedQuickNavListContent()
+    fun pagedList_shouldShowsNextButton_whenAllItemIsNotOnScreen() {
+        pagedListContent()
         composeTestRule.apply {
-            onNodeWithTag(pagedQuickNavListTag).assertExists()
-            onNodeWithTag(pagedQuickNavListDownButtonTag).assertIsDisplayed()
-            onNodeWithTag(pagedQuickNavListUpButtonTag).assertIsNotDisplayed()
+            onNodeWithTag(pagedListTag).assertExists()
+            onNodeWithTag(pagedListNextButtonTag).assertIsDisplayed()
+            onNodeWithTag(pagedListPreviousButtonTag).assertIsNotDisplayed()
         }
     }
 
     @Test
-    fun pagedQuickNavList_shouldShowUpButton_whenDownButtonIsClicked() {
-        pagedQuickNavListContent()
+    fun pagedList_shouldShowPreviousButton_whenNextButtonIsClicked() {
+        pagedListContent()
         composeTestRule.apply {
-            onNodeWithTag(pagedQuickNavListDownButtonTag).performClick()
+            onNodeWithTag(pagedListNextButtonTag).performClick()
             waitForIdle()
-            onNodeWithTag(pagedQuickNavListUpButtonTag).assertIsDisplayed()
+            onNodeWithTag(pagedListPreviousButtonTag).assertIsDisplayed()
         }
     }
 
     @Test
-    fun pagedQuickNavList_shouldNavigateBackToStart_whenScrollingDownAndThenUp() {
+    fun pagedList_shouldNavigateBackToStart_whenScrollingDownAndThenUp() {
         val listState = LazyListState()
         composeTestRule.setContent {
-            PagedQuickNavList(listState = listState) {
+            PagedList(listState = listState) {
                 items(items) { item ->
                     Text(text = item, modifier = Modifier.fillMaxWidth())
                 }
@@ -94,14 +93,14 @@ class PagedQuickNavListTest {
         }
         
         composeTestRule.apply {
-            // Click down
-            onNodeWithTag(pagedQuickNavListDownButtonTag).performClick()
+            // Click next
+            onNodeWithTag(pagedListNextButtonTag).performClick()
             waitForIdle()
             val indexAfterDown = listState.firstVisibleItemIndex
             assert(indexAfterDown > 0)
             
-            // Click up
-            onNodeWithTag(pagedQuickNavListUpButtonTag).performClick()
+            // Click previous
+            onNodeWithTag(pagedListPreviousButtonTag).performClick()
             waitForIdle()
             val indexAfterUp = listState.firstVisibleItemIndex
             

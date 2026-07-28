@@ -4,6 +4,8 @@ plugins {
     `maven-publish`
 }
 
+val libraryVersion = "0.1.2"
+
 android {
     namespace = "br.com.arml.composecollections"
     compileSdk = 37
@@ -12,8 +14,8 @@ android {
         applicationId = "br.com.arml.composecollections"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = libraryVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -66,7 +68,7 @@ dependencies {
 }
 
 group = "br.com.arml"
-version = "0.1.1"
+version = libraryVersion
 
 publishing {
     publications {
@@ -77,7 +79,7 @@ publishing {
 
             groupId = "br.com.arml.composecollections"
             artifactId = "composecollections"
-            version = "0.1.1"
+            version = libraryVersion
 
             pom {
                 name.set("ComposeCollections")
@@ -92,7 +94,7 @@ publishing {
                 developers {
                     developer {
                         id.set("albertrml")
-                        name.set("Alberto")
+                        name.set("Albert Richard")
                     }
                 }
                 scm {
