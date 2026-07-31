@@ -7,7 +7,7 @@
     <string name="quickNavList_downButton_text">Fim</string>
     <string name="quickNavList_upButton_contentDescription">Mover para o início da lista</string>
     <string name="quickNavList_upButton_testTag">QuickNavListUpButtonTestTag</string>
-    <string name="quickNavList_upButton_text">Topo</string>
+    <string name="quickNavList_upButton_text">Início</string>
 
     <string name="pagedQuickNavList_component_testTag">PagedQuickNavListComponent</string>
     <string name="pagedQuickNavList_downButton_contentDescription">Mover uma página para baixo</string>

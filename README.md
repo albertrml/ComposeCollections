@@ -11,15 +11,14 @@ O **ComposeCollections** foca em melhorar a experiência de navegação em lista
 
 ## ✨ Recursos
 
-*   **EdgedList**: Uma `LazyColumn` aprimorada com botões para saltar diretamente para o **início** ou para o **fim** da lista.
-*   **PagedList**: Uma versão que navega por **páginas**, rolando exatamente a quantidade de itens visíveis na tela.
-*   **Smart Visibility**: Botões de navegação inteligentes que aparecem/desaparecem baseados na posição do scroll.
-*   **Animações Suaves**: Transições fluidas de entrada e saída para os controles de navegação.
-*   **Altamente Customizável**: Suporte total a temas e internacionalização.
+*   **EdgedList & EdgedGrid**: Lazy containers aprimorados com botões para saltar diretamente para o **início** ou para o **fim**.
+*   **PagedList & PagedGrid**: Navegação por **páginas**, rolando exatamente a quantidade de itens visíveis na tela (viewport).
+*   **Suporte Horizontal & Vertical**: Todos os componentes suportam ambas as orientações via `QuickNavLayoutSpec`.
+*   **Modo Overlay**: Botões de navegação inteligentes que podem flutuar sobre o conteúdo ou ocupar espaços dedicados.
+*   **Customização Total**: Interface `QuickNavState` para lógicas de scroll próprias e `QuickNavTheme` para estilo global.
+*   **API Protegida**: Componentes de suporte internos estão ocultos para garantir uma superfície de API limpa e estável.
 
 ## 📦 Instalação
-
-A **ComposeCollections** pode ser consumida via **GitHub Packages**.
 
 ### 1. Configurar o GitHub Packages no seu `settings.gradle.kts`
 
@@ -45,39 +44,47 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    implementation("br.com.arml.composecollections:composecollections:0.1.2")
+    implementation("br.com.arml.composecollections:composecollections:0.2.0")
 }
 ```
 
 ## 💡 Exemplos de Uso
 
-### Navegação de Extremos (Início/Fim)
+### Lista Paginada (Vertical)
 ```kotlin
-EdgedList(modifier = Modifier.fillMaxSize()) {
-    items(myData) { item ->
-        Text(item.name)
-    }
+import br.com.arml.composecollections.scrollables.layout.list.PagedList
+
+PagedList(
+    layoutSpec = QuickNavLayoutSpec.Vertical(),
+    navigationAlignment = NavigationAlignment.Bottom
+) {
+    items(100) { item -> Text("Item $item") }
 }
 ```
 
-### Navegação por Páginas
+### Grade de Extremos (Horizontal Overlay)
 ```kotlin
-PagedList(modifier = Modifier.fillMaxSize()) {
-    items(myData) { item ->
-        Text(item.name)
-    }
+import br.com.arml.composecollections.scrollables.layout.grid.EdgedGrid
+
+EdgedGrid(
+    columns = GridCells.Fixed(3),
+    layoutSpec = QuickNavLayoutSpec.Horizontal(),
+    isOverlay = true
+) {
+    items(100) { item -> Card { Text("Box $item") } }
 }
 ```
 
 ## 🎨 Customização e Temas
 
-A partir da versão **0.1.2**, você pode customizar globalmente rótulos, ícones e animações usando o `QuickNavTheme`.
+Você pode customizar globalmente rótulos, ícones e animações usando o `QuickNavTheme`.
 
 ### Tradução de Rótulos
 ```kotlin
-val customLabels = QuickNavLabelDefaults.edgedLabels().copy(
-    previousLabel = "Voltar ao Início",
-    nextLabel = "Ir para o Fim"
+val customLabels = QuickNavLabels(
+    previousLabel = "Voltar",
+    nextLabel = "Avançar",
+    // ...
 )
 
 QuickNavTheme(labels = customLabels) {
@@ -85,17 +92,13 @@ QuickNavTheme(labels = customLabels) {
 }
 ```
 
-### Troca de Ícones
-```kotlin
-val customIcons = QuickNavIconDefaults.default.copy(
-    upIcon = Icons.Filled.ArrowUpward,
-    downIcon = Icons.Filled.ArrowDownward
-)
+## 📚 Documentação Detalhada
 
-QuickNavTheme(icons = customIcons) {
-    PagedList { /* ... */ }
-}
-```
+Confira nossos guias:
+- [Arquitetura](app/src/main/java/br/com/arml/composecollections/docs/ARCHITECTURE.md)
+- [Customização e Estados](app/src/main/java/br/com/arml/composecollections/docs/CUSTOMIZATION.md)
+- [Guia de Migração (v0.1 para v0.2)](app/src/main/java/br/com/arml/composecollections/docs/MIGRATION_GUIDE.md)
+- [Primeiros Passos](app/src/main/java/br/com/arml/composecollections/docs/GETTING_STARTED.md)
 
 ## 🤝 Contribuição
 

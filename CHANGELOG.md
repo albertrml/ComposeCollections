@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-07-31
+
+### Added
+- **Grid Support**: Introduced `PagedGrid` and `EdgedGrid` components for fast navigation in multi-column collections.
+- **Horizontal Orientation**: Full support for `LazyRow` and `LazyHorizontalGrid` via generic `layoutSpec` parameter.
+- **Architecture**: Implemented `QuickNavScaffold` and `QuickNavLayout` as the foundation for all scrollable components, ensuring consistent behavior and layout stability.
+- **State Abstraction**: Introduced the `QuickNavState` interface, allowing developers to implement custom navigation logic and scroll behaviors.
+- **Comprehensive Documentation**: Added specialized guides in `docs/` covering architecture, customization, and migration.
+
+### Changed
+- **Package Renaming**: Migrated all components from `...composecollections` to `...scrollables` for better categorization and future-proofing.
+- **API Unification**: Unified orientation-specific functions into single generic components (e.g., `VerticalPagedList` is now `PagedList` with `QuickNavLayoutSpec.Vertical`).
+
+### Fixed
+- **Layout Deformation**: Resolved issues where navigation panels would stretch the scrollable content in certain configurations using `fill = false` and `wrapContent` modifiers.
+- **Testing**: Unified the test suite to cover all orientations and layout modes.
+
 ## [0.1.2] - 2026-07-28
 
 ### Changed

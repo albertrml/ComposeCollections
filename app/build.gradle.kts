@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
 }
 
-val libraryVersion = "0.1.2"
+val libraryVersion = "0.2.0"
 
 android {
     namespace = "br.com.arml.composecollections"
@@ -14,7 +14,7 @@ android {
         applicationId = "br.com.arml.composecollections"
         minSdk = 24
         targetSdk = 37
-        versionCode = 2
+        versionCode = 3
         versionName = libraryVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -47,6 +47,7 @@ dependencies {
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.compose)
 
     implementation(composeBom)
 
@@ -67,7 +68,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
 }
 
-group = "br.com.arml"
+group = "br.com.arml.composecollections"
 version = libraryVersion
 
 publishing {
