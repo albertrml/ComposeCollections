@@ -16,6 +16,7 @@ Located in `.scrollables.layout.foundation`, this is the lowest level of the UI.
 Also in `.scrollables.layout.foundation`, this acts as a high-level template.
 - Injects the `QuickNavTheme`.
 - Orchestrates four internal `NavigationRouter` calls to handle all possible button placements (Top, Bottom, Start, End).
+- Provides an optional `indicator` slot for visual feedback (e.g., progress bars).
 - Bridges the generic layout with specific navigation triggers provided by the state.
 
 ### 3. Specialized Components

@@ -16,4 +16,6 @@
     <string name="pagedQuickNavList_upButton_contentDescription">Mover uma página para cima</string>
     <string name="pagedQuickNavList_upButton_testTag">PagedQuickNavListUpButtonTestTag</string>
     <string name="pagedQuickNavList_upButton_text">Anterior</string>
+
+    <string name="quickNav_indicator_testTag">QuickNavIndicatorTestTag</string>
 </resources>

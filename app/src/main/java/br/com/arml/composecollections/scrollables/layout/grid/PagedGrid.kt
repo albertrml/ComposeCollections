@@ -34,6 +34,7 @@ import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutDefault
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutSpec
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabelDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
+import br.com.arml.composecollections.scrollables.internal.QuickNavLinearIndicator
 import br.com.arml.composecollections.scrollables.layout.foundation.QuickNavScaffold
 import br.com.arml.composecollections.scrollables.state.QuickNavState
 import br.com.arml.composecollections.scrollables.state.rememberQuickNavGridState
@@ -67,6 +68,7 @@ fun PagedGrid(
     isOverlay: Boolean = false,
     labels: QuickNavLabels = LocalQuickNavLabels.current ?: QuickNavLabelDefaults.pagedLabels(),
     icons: QuickNavIcons = QuickNavIconDefaults.default,
+    showIndicator: Boolean = false,
     content: LazyGridScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -87,7 +89,15 @@ fun PagedGrid(
         showBackward = { quickNavState.showScrollToStart },
         showForward = { quickNavState.showScrollToEnd },
         onScrollBack = onScrollBack,
-        onScrollForward = onScrollForward
+        onScrollForward = onScrollForward,
+        indicator = {
+            if (showIndicator) {
+                QuickNavLinearIndicator(
+                    progress = quickNavState.scrollProgress,
+                    isHorizontal = isHorizontal
+                )
+            }
+        }
     ) { containerModifier ->
         when (layoutSpec) {
             is QuickNavLayoutSpec.Vertical -> LazyVerticalGrid(

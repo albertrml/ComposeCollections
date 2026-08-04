@@ -39,6 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import br.com.arml.composecollections.scrollables.samples.scrollables.*
 
@@ -63,6 +64,7 @@ enum class Screen {
     HorizontalPagedGrid,
     VerticalStaggeredPinterest,
     HorizontalStaggeredGrid,
+    ListWithIndicator,
     ThemedSample
 }
 
@@ -70,6 +72,7 @@ enum class Screen {
 @Composable
 fun GalleryApp() {
     var currentScreen by remember { mutableStateOf(Screen.Dashboard) }
+    val configuration = LocalConfiguration.current
 
     MaterialTheme {
         Scaffold(
@@ -114,6 +117,7 @@ fun GalleryApp() {
                     Screen.HorizontalPagedGrid -> HorizontalPagedGridSample()
                     Screen.VerticalStaggeredPinterest -> VerticalStaggeredPinterestSample()
                     Screen.HorizontalStaggeredGrid -> HorizontalStaggeredGridSample()
+                    Screen.ListWithIndicator -> ListWithIndicatorSample(configuration.orientation)
                     Screen.ThemedSample -> ThemedNavigationSample()
                 }
             }
@@ -146,8 +150,11 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
         }
 
         item { CategoryHeader("Customization") }
-        item {
-            SampleItem("Custom Labels & Icons", onClick = { onNavigate(Screen.ThemedSample) })
+        items(listOf(
+            "Scroll Indicators" to Screen.ListWithIndicator,
+            "Custom Labels & Icons" to Screen.ThemedSample
+        )) { (label, screen) ->
+            SampleItem(label, onClick = { onNavigate(screen) })
         }
     }
 }

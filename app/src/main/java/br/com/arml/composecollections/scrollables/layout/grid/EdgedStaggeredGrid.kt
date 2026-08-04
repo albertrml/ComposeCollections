@@ -67,6 +67,7 @@ fun EdgedStaggeredGrid(
     isOverlay: Boolean = false,
     labels: QuickNavLabels = LocalQuickNavLabels.current ?: QuickNavLabelDefaults.edgedLabels(),
     icons: QuickNavIcons = QuickNavIconDefaults.default,
+    showIndicator: Boolean = false,
     content: LazyStaggeredGridScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -91,7 +92,15 @@ fun EdgedStaggeredGrid(
         showBackward = { quickNavState.showScrollToStart },
         showForward = { quickNavState.showScrollToEnd },
         onScrollBack = onScrollToStart,
-        onScrollForward = onScrollToEnd
+        onScrollForward = onScrollToEnd,
+        indicator = {
+            if (showIndicator) {
+                br.com.arml.composecollections.scrollables.internal.QuickNavLinearIndicator(
+                    progress = quickNavState.scrollProgress,
+                    isHorizontal = isHorizontal
+                )
+            }
+        }
     ) { containerModifier ->
         when (layoutSpec) {
             is QuickNavLayoutSpec.Vertical -> LazyVerticalStaggeredGrid(

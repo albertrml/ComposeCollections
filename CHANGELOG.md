@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-08-04
+
+### Added
+- **Visual Progress Indicators**: Introduced `scrollProgress` to the `QuickNavState` interface, allowing real-time tracking of scroll position.
+- **Scroll Indicators**: Added `QuickNavLinearIndicator`, a customizable progress bar that adapts to both vertical and horizontal layouts.
+- **Scaffold Slot**: Added a dedicated `indicator` slot to `QuickNavScaffold` for easier integration of progress visuals.
+- **Feature Flag**: New `showIndicator: Boolean` parameter added to all public List and Grid components for instant progress bar activation.
+
+### Changed
+- **Internal Refactoring**: Renamed internal assembly function to `QuickNavNavigationFrame` and marked it as `internal` to further protect the public API.
+
+### Fixed
+- **Precision**: Improved scroll progress calculation logic to reach exactly 1.0 when the last item is fully visible.
+
 ## [0.2.1] - 2026-07-31
 
 ### Added

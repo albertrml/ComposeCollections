@@ -56,6 +56,21 @@ class QuickNavListState(
     /** Alias for [showScrollToEnd]. */
     override val showScrollToNext get() = showScrollToEnd
 
+    /**
+     * The current scroll progress as a percentage from 0.0 to 1.0.
+     */
+    override val scrollProgress: Float by derivedStateOf {
+        val layoutInfo = listState.layoutInfo
+        val totalItems = layoutInfo.totalItemsCount
+        val visibleItems = layoutInfo.visibleItemsInfo.size
+        
+        if (totalItems <= visibleItems) {
+            0f
+        } else {
+            listState.firstVisibleItemIndex.toFloat() / (totalItems - visibleItems)
+        }
+    }
+
     /** Scrolls smoothly to the first item in the list. */
     override fun animateScrollToStart(scope: CoroutineScope) = scope.launch {
         listState.animateScrollToItem(0)

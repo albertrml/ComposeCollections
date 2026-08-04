@@ -42,6 +42,11 @@ interface QuickNavState {
     val showScrollToNext: Boolean
 
     /**
+     * The current scroll progress as a percentage from 0.0 to 1.0.
+     */
+    val scrollProgress: Float
+
+    /**
      * Smoothly scrolls to the starting extreme of the collection.
      *
      * @param scope The [CoroutineScope] to launch the animation in.

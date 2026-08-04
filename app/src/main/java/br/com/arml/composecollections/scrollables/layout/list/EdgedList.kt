@@ -31,6 +31,7 @@ import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutDefault
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutSpec
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabelDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
+import br.com.arml.composecollections.scrollables.internal.QuickNavLinearIndicator
 import br.com.arml.composecollections.scrollables.layout.foundation.QuickNavScaffold
 import br.com.arml.composecollections.scrollables.state.QuickNavState
 import br.com.arml.composecollections.scrollables.state.rememberQuickNavListState
@@ -74,6 +75,7 @@ fun EdgedList(
     isOverlay: Boolean = false,
     labels: QuickNavLabels = LocalQuickNavLabels.current ?: QuickNavLabelDefaults.edgedLabels(),
     icons: QuickNavIcons = QuickNavIconDefaults.default,
+    showIndicator: Boolean = false,
     content: LazyListScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -94,7 +96,15 @@ fun EdgedList(
         showBackward = { quickNavState.showScrollToStart },
         showForward = { quickNavState.showScrollToEnd },
         onScrollBack = onScrollToStart,
-        onScrollForward = onScrollToEnd
+        onScrollForward = onScrollToEnd,
+        indicator = {
+            if (showIndicator) {
+                QuickNavLinearIndicator(
+                    progress = quickNavState.scrollProgress,
+                    isHorizontal = isHorizontal
+                )
+            }
+        }
     ) { containerModifier ->
         when (layoutSpec) {
             is QuickNavLayoutSpec.Vertical -> LazyColumn(

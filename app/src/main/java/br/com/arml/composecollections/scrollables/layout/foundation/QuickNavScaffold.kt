@@ -10,6 +10,8 @@
 
 package br.com.arml.composecollections.scrollables.layout.foundation
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
@@ -49,74 +51,130 @@ fun QuickNavScaffold(
     showForward: () -> Boolean,
     onScrollBack: () -> Unit,
     onScrollForward: () -> Unit,
+    indicator: @Composable () -> Unit = {},
     container: @Composable (Modifier) -> Unit
 ) {
     QuickNavTheme(labels = labels, icons = icons) {
-        QuickNavLayout(
-            modifier = modifier,
-            isOverlay = isOverlay,
-            contentTop = {
-                NavigationRouter(
-                    alignment = navigationAlignment,
-                    target = NavigationAlignment.Top,
-                    secondaryTarget = NavigationAlignment.Vertical,
-                    isHorizontal = isHorizontal,
-                    isStart = true,
+        if(isHorizontal){
+            Column(modifier = modifier) {
+                indicator()
+                QuickNavNavigationFrame(
+                    modifier = Modifier,
+                    isOverlay = isOverlay,
+                    navigationAlignment = navigationAlignment,
                     labels = labels,
                     icons = icons,
+                    isHorizontal = true,
                     showBackward = showBackward,
                     showForward = showForward,
                     onScrollBack = onScrollBack,
-                    onScrollForward = onScrollForward
-                )
-            },
-            contentBottom = {
-                NavigationRouter(
-                    alignment = navigationAlignment,
-                    target = NavigationAlignment.Bottom,
-                    secondaryTarget = NavigationAlignment.Vertical,
-                    isHorizontal = isHorizontal,
-                    isStart = false,
-                    labels = labels,
-                    icons = icons,
-                    showBackward = showBackward,
-                    showForward = showForward,
-                    onScrollBack = onScrollBack,
-                    onScrollForward = onScrollForward
-                )
-            },
-            contentLeft = {
-                NavigationRouter(
-                    alignment = navigationAlignment,
-                    target = NavigationAlignment.Start,
-                    secondaryTarget = NavigationAlignment.Horizontal,
-                    isHorizontal = isHorizontal,
-                    isStart = true,
-                    labels = labels,
-                    icons = icons,
-                    showBackward = showBackward,
-                    showForward = showForward,
-                    onScrollBack = onScrollBack,
-                    onScrollForward = onScrollForward
-                )
-            },
-            contentRight = {
-                NavigationRouter(
-                    alignment = navigationAlignment,
-                    target = NavigationAlignment.End,
-                    secondaryTarget = NavigationAlignment.Horizontal,
-                    isHorizontal = isHorizontal,
-                    isStart = false,
-                    labels = labels,
-                    icons = icons,
-                    showBackward = showBackward,
-                    showForward = showForward,
-                    onScrollBack = onScrollBack,
-                    onScrollForward = onScrollForward
+                    onScrollForward = onScrollForward,
+                    container = container
                 )
             }
-        ) {
-            container(Modifier)
         }
+        else {
+            Row(modifier = modifier) {
+                QuickNavNavigationFrame(
+                    modifier = Modifier.weight(1f),
+                    isOverlay = isOverlay,
+                    navigationAlignment = navigationAlignment,
+                    labels = labels,
+                    icons = icons,
+                    isHorizontal = false,
+                    showBackward = showBackward,
+                    showForward = showForward,
+                    onScrollBack = onScrollBack,
+                    onScrollForward = onScrollForward,
+                    container = container
+                )
+                indicator()
+            }
+        }
+    }
+}
+
+/**
+ * Internal frame that assembles navigation routers around the main content.
+ */
+@Composable
+internal fun QuickNavNavigationFrame(
+    modifier: Modifier = Modifier,
+    isOverlay: Boolean = false,
+    navigationAlignment: NavigationAlignment = NavigationAlignment.Bottom,
+    labels: QuickNavLabels,
+    icons: QuickNavIcons,
+    isHorizontal: Boolean,
+    showBackward: () -> Boolean,
+    showForward: () -> Boolean,
+    onScrollBack: () -> Unit,
+    onScrollForward: () -> Unit,
+    container: @Composable (Modifier) -> Unit
+) {
+    QuickNavLayout(
+        modifier = modifier,
+        isOverlay = isOverlay,
+        contentTop = {
+            NavigationRouter(
+                alignment = navigationAlignment,
+                target = NavigationAlignment.Top,
+                secondaryTarget = NavigationAlignment.Vertical,
+                isHorizontal = isHorizontal,
+                isStart = true,
+                labels = labels,
+                icons = icons,
+                showBackward = showBackward,
+                showForward = showForward,
+                onScrollBack = onScrollBack,
+                onScrollForward = onScrollForward
+            )
+        },
+        contentBottom = {
+            NavigationRouter(
+                alignment = navigationAlignment,
+                target = NavigationAlignment.Bottom,
+                secondaryTarget = NavigationAlignment.Vertical,
+                isHorizontal = isHorizontal,
+                isStart = false,
+                labels = labels,
+                icons = icons,
+                showBackward = showBackward,
+                showForward = showForward,
+                onScrollBack = onScrollBack,
+                onScrollForward = onScrollForward
+            )
+        },
+        contentLeft = {
+            NavigationRouter(
+                alignment = navigationAlignment,
+                target = NavigationAlignment.Start,
+                secondaryTarget = NavigationAlignment.Horizontal,
+                isHorizontal = isHorizontal,
+                isStart = true,
+                labels = labels,
+                icons = icons,
+                showBackward = showBackward,
+                showForward = showForward,
+                onScrollBack = onScrollBack,
+                onScrollForward = onScrollForward
+            )
+        },
+        contentRight = {
+            NavigationRouter(
+                alignment = navigationAlignment,
+                target = NavigationAlignment.End,
+                secondaryTarget = NavigationAlignment.Horizontal,
+                isHorizontal = isHorizontal,
+                isStart = false,
+                labels = labels,
+                icons = icons,
+                showBackward = showBackward,
+                showForward = showForward,
+                onScrollBack = onScrollBack,
+                onScrollForward = onScrollForward
+            )
+        }
+    ) {
+        container(Modifier)
     }
 }
