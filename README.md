@@ -13,6 +13,7 @@ O **ComposeCollections** foca em melhorar a experiência de navegação em lista
 
 *   **EdgedList & EdgedGrid**: Lazy containers aprimorados com botões para saltar diretamente para o **início** ou para o **fim**.
 *   **PagedList & PagedGrid**: Navegação por **páginas**, rolando exatamente a quantidade de itens visíveis na tela (viewport).
+*   **Suporte a Staggered Grids**: Agora suportamos grades irregulares estilo Pinterest via `PagedStaggeredGrid` e `EdgedStaggeredGrid`.
 *   **Suporte Horizontal & Vertical**: Todos os componentes suportam ambas as orientações via `QuickNavLayoutSpec`.
 *   **Modo Overlay**: Botões de navegação inteligentes que podem flutuar sobre o conteúdo ou ocupar espaços dedicados.
 *   **Customização Total**: Interface `QuickNavState` para lógicas de scroll próprias e `QuickNavTheme` para estilo global.
@@ -44,7 +45,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    implementation("br.com.arml.composecollections:composecollections:0.2.0")
+    implementation("br.com.arml.composecollections:composecollections:0.2.1")
 }
 ```
 

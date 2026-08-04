@@ -22,13 +22,14 @@ Also in `.scrollables.layout.foundation`, this acts as a high-level template.
 These are the public APIs developers interact with most:
 - **Lists**: `PagedList` and `EdgedList`.
 - **Grids**: `PagedGrid` and `EdgedGrid`.
+- **Staggered Grids**: `PagedStaggeredGrid` and `EdgedStaggeredGrid`.
 - Each component is a "thin wrapper" around the Scaffold, passing its specific scroll state and actions.
 
 ## State Management (`QuickNavState`)
 
 We use a **State Hoisting** pattern via the `QuickNavState` interface.
 - **Contract-Based**: Components depend on the interface, not concrete implementations.
-- **Derived Logic**: Standard implementations (`QuickNavListState`, `QuickNavGridState`) use `derivedStateOf` to efficiently track scroll position and toggle button visibility without causing global recompositions.
+- **Derived Logic**: Standard implementations (`QuickNavListState`, `QuickNavGridState`, `QuickNavStaggeredGridState`) use `derivedStateOf` to efficiently track scroll position and toggle button visibility without causing global recompositions.
 
 ## Component Hierarchy
 

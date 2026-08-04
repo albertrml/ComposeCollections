@@ -8,7 +8,7 @@ Add the dependency to your `build.gradle.kts` (module app):
 
 ```kotlin
 dependencies {
-    implementation("br.com.arml.composecollections:composecollections:0.2.0")
+    implementation("br.com.arml.composecollections:composecollections:0.2.1")
 }
 ```
 
@@ -51,6 +51,28 @@ fun MyGrid() {
     ) {
         items(100) { index ->
             Card { Text("Box $index") }
+        }
+    }
+}
+```
+
+## 4. Staggered Grid (Pinterest Style)
+
+For layouts with items of varying sizes, use `PagedStaggeredGrid`.
+
+```kotlin
+import br.com.arml.composecollections.scrollables.layout.grid.PagedStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+
+@Composable
+fun PinterestFeed() {
+    PagedStaggeredGrid(
+        cells = StaggeredGridCells.Fixed(2),
+        navigationAlignment = NavigationAlignment.Bottom
+    ) {
+        items(100) { index ->
+            // Irregular sizes will create the staggered effect
+            Box(...) 
         }
     }
 }

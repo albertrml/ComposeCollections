@@ -61,6 +61,8 @@ enum class Screen {
     StickyHeaderList,
     VerticalEdgedGrid,
     HorizontalPagedGrid,
+    VerticalStaggeredPinterest,
+    HorizontalStaggeredGrid,
     ThemedSample
 }
 
@@ -110,6 +112,8 @@ fun GalleryApp() {
                     Screen.StickyHeaderList -> StickyHeaderListSample()
                     Screen.VerticalEdgedGrid -> VerticalEdgedGridSample()
                     Screen.HorizontalPagedGrid -> HorizontalPagedGridSample()
+                    Screen.VerticalStaggeredPinterest -> VerticalStaggeredPinterestSample()
+                    Screen.HorizontalStaggeredGrid -> HorizontalStaggeredGridSample()
                     Screen.ThemedSample -> ThemedNavigationSample()
                 }
             }
@@ -134,7 +138,9 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
         item { CategoryHeader("Grids") }
         items(listOf(
             "Vertical Edged Grid" to Screen.VerticalEdgedGrid,
-            "Horizontal Paged Grid" to Screen.HorizontalPagedGrid
+            "Horizontal Paged Grid" to Screen.HorizontalPagedGrid,
+            "Vertical Staggered Pinterest" to Screen.VerticalStaggeredPinterest,
+            "Horizontal Staggered Grid" to Screen.HorizontalStaggeredGrid
         )) { (label, screen) ->
             SampleItem(label, onClick = { onNavigate(screen) })
         }
