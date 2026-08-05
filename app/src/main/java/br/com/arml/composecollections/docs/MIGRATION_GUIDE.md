@@ -46,3 +46,19 @@ If you have UI tests, note that the standard buttons now use tags provided by th
 
 > [!TIP]
 > You can now customize these tags globally via `QuickNavTheme`.
+
+## 5. Semantic Unification (v0.2.3)
+
+In version 0.2.3, we unified the navigation API to use direction-based terms (`Backward` and `Forward`) instead of location-based terms (`Start`, `End`, `Previous`, `Next`).
+
+### State Changes
+
+The following properties and methods in `QuickNavState` have been renamed:
+
+- `showScrollToStart` / `showScrollToPrevious` -> **`showScrollToBackward`**
+- `showScrollToEnd` / `showScrollToNext` -> **`showScrollToForward`**
+- `animateScrollToStart` / `animateScrollToPreviousPage` -> **`animateScrollToBackward()`**
+- `animateScrollToEnd` / `animateScrollToNextPage` -> **`animateScrollToForward()`**
+
+> [!WARNING]
+> The old methods are currently marked as `@Deprecated` and will be **permanently removed in version 0.3.0**. Please use the IDE's automated "Replace with" feature to update your code.

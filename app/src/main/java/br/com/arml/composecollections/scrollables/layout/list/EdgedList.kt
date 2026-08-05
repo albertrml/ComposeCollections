@@ -25,12 +25,14 @@ import androidx.compose.ui.res.stringResource
 import br.com.arml.composecollections.R
 import br.com.arml.composecollections.scrollables.defaults.LocalQuickNavLabels
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
+import br.com.arml.composecollections.scrollables.defaults.QuickNavAnimationMode
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIconDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIcons
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutSpec
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabelDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
+import br.com.arml.composecollections.scrollables.defaults.QuickNavMode
 import br.com.arml.composecollections.scrollables.internal.QuickNavLinearIndicator
 import br.com.arml.composecollections.scrollables.layout.foundation.QuickNavScaffold
 import br.com.arml.composecollections.scrollables.state.QuickNavState
@@ -40,49 +42,37 @@ import br.com.arml.composecollections.scrollables.state.rememberQuickNavListStat
  * A highly customizable list that provides navigation controls to jump directly to the
  * start or end of the collection.
  *
- * This component supports both [LazyColumn] and [LazyRow] through the [layoutSpec] parameter.
- * It automatically handles theme propagation and button visibility based on the current
- * scroll position.
- *
- * Example usage:
- *
- * ```kotlin
- * EdgedList(
- *     layoutSpec = QuickNavLayoutSpec.Vertical(),
- *     navigationAlignment = NavigationAlignment.End
- * ) {
- *     items(myData) { item -> Text(item.name) }
- * }
- * ```
- *
  * @param modifier The modifier to be applied to the root layout.
  * @param listState The state object to be used to control the list.
- * @param quickNavState The navigation state controller. Defaults to a standard list implementation.
+ * @param quickNavState The navigation state controller.
  * @param layoutSpec Defines the orientation, arrangement, and alignment of the list items.
- * @param navigationAlignment Where to place the navigation controls (e.g., Bottom, Start, End).
+ * @param navigationAlignment Where to place the navigation controls.
+ * @param animationMode The scroll animation preset.
  * @param isOverlay If true, navigation buttons float over the list content.
- * @param labels Labels and tags for navigation buttons. Defaults to themed or edged defaults.
- * @param icons Icon set for navigation buttons. Defaults to standard theme icons.
- * @param content The content of the list, defined using [LazyListScope].
+ * @param showIndicator If true, displays a scroll progress indicator.
+ * @param labels Labels and tags for navigation buttons.
+ * @param icons Icon set for navigation buttons.
+ * @param content The content of the list.
  */
 @Composable
 fun EdgedList(
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
-    quickNavState: QuickNavState = rememberQuickNavListState(listState),
+    quickNavState: QuickNavState = rememberQuickNavListState(listState, QuickNavMode.Edged),
     layoutSpec: QuickNavLayoutSpec = QuickNavLayoutDefaults.Vertical,
     navigationAlignment: NavigationAlignment = NavigationAlignment.Bottom,
+    animationMode: QuickNavAnimationMode = QuickNavAnimationMode.Default,
     isOverlay: Boolean = false,
+    showIndicator: Boolean = false,
     labels: QuickNavLabels = LocalQuickNavLabels.current ?: QuickNavLabelDefaults.edgedLabels(),
     icons: QuickNavIcons = QuickNavIconDefaults.default,
-    showIndicator: Boolean = false,
     content: LazyListScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
     // Stable actions
-    val onScrollToStart = remember(quickNavState, scope) { { quickNavState.animateScrollToStart(scope); Unit } }
-    val onScrollToEnd = remember(quickNavState, scope) { { quickNavState.animateScrollToEnd(scope); Unit } }
+    val onScrollBackward = remember(quickNavState, scope) { { quickNavState.animateScrollToBackward(scope); Unit } }
+    val onScrollForward = remember(quickNavState, scope) { { quickNavState.animateScrollToForward(scope); Unit } }
 
     val isHorizontal = layoutSpec is QuickNavLayoutSpec.Horizontal
 
@@ -93,10 +83,10 @@ fun EdgedList(
         labels = labels,
         icons = icons,
         isHorizontal = isHorizontal,
-        showBackward = { quickNavState.showScrollToStart },
-        showForward = { quickNavState.showScrollToEnd },
-        onScrollBack = onScrollToStart,
-        onScrollForward = onScrollToEnd,
+        showBackward = { quickNavState.showScrollToBackward },
+        showForward = { quickNavState.showScrollToForward },
+        onScrollBackward = onScrollBackward,
+        onScrollForward = onScrollForward,
         indicator = {
             if (showIndicator) {
                 QuickNavLinearIndicator(

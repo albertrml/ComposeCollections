@@ -54,7 +54,7 @@ class QuickNavScaffoldTest {
                 navigationAlignment = NavigationAlignment.Top,
                 showBackward = { true },
                 showForward = { false },
-                onScrollBack = { clicked = true },
+                onScrollBackward = { clicked = true },
                 onScrollForward = {}
             ) {
                 Box(Modifier.fillMaxSize()) { Text("Content") }

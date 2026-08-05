@@ -28,12 +28,14 @@ import androidx.compose.ui.unit.dp
 import br.com.arml.composecollections.R
 import br.com.arml.composecollections.scrollables.defaults.LocalQuickNavLabels
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
+import br.com.arml.composecollections.scrollables.defaults.QuickNavAnimationMode
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIconDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIcons
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutSpec
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabelDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
+import br.com.arml.composecollections.scrollables.defaults.QuickNavMode
 import br.com.arml.composecollections.scrollables.internal.QuickNavLinearIndicator
 import br.com.arml.composecollections.scrollables.layout.foundation.QuickNavScaffold
 import br.com.arml.composecollections.scrollables.state.QuickNavState
@@ -42,43 +44,39 @@ import br.com.arml.composecollections.scrollables.state.rememberQuickNavStaggere
 /**
  * A highly customizable staggered grid that navigates through content page-by-page.
  *
- * This component supports both [LazyVerticalStaggeredGrid] and [LazyHorizontalStaggeredGrid] through
- * the [layoutSpec] parameter.
- *
  * @param cells The cell configuration for the staggered grid.
  * @param modifier The modifier to be applied to the root layout.
  * @param gridState The state object to be used to control the grid.
  * @param quickNavState The navigation state controller. Defaults to a standard staggered implementation.
  * @param layoutSpec Defines the orientation and item arrangement.
  * @param navigationAlignment Where to place the navigation controls.
+ * @param animationMode The scroll animation preset.
  * @param isOverlay If true, navigation buttons float over the grid content.
+ * @param showIndicator If true, displays a scroll progress indicator.
  * @param labels Labels and tags for navigation buttons.
  * @param icons Icon set for navigation buttons.
- * @param content The content of the staggered grid, defined using [LazyStaggeredGridScope].
+ * @param content The content of the staggered grid.
  */
 @Composable
 fun PagedStaggeredGrid(
     cells: StaggeredGridCells,
     modifier: Modifier = Modifier,
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
-    quickNavState: QuickNavState = rememberQuickNavStaggeredGridState(gridState),
+    quickNavState: QuickNavState = rememberQuickNavStaggeredGridState(gridState, QuickNavMode.Paged),
     layoutSpec: QuickNavLayoutSpec = QuickNavLayoutDefaults.Vertical,
     navigationAlignment: NavigationAlignment = NavigationAlignment.Bottom,
+    animationMode: QuickNavAnimationMode = QuickNavAnimationMode.Default,
     isOverlay: Boolean = false,
+    showIndicator: Boolean = false,
     labels: QuickNavLabels = LocalQuickNavLabels.current ?: QuickNavLabelDefaults.pagedLabels(),
     icons: QuickNavIcons = QuickNavIconDefaults.default,
-    showIndicator: Boolean = false,
     content: LazyStaggeredGridScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
     // Stable actions
-    val onScrollBack = remember(quickNavState, scope) {
-        { quickNavState.animateScrollToPreviousPage(scope); Unit }
-    }
-    val onScrollForward = remember(quickNavState, scope) {
-        { quickNavState.animateScrollToNextPage(scope); Unit }
-    }
+    val onScrollBackward = remember(quickNavState, scope) { { quickNavState.animateScrollToBackward(scope); Unit } }
+    val onScrollForward = remember(quickNavState, scope) { { quickNavState.animateScrollToForward(scope); Unit } }
 
     val isHorizontal = layoutSpec is QuickNavLayoutSpec.Horizontal
 
@@ -89,9 +87,9 @@ fun PagedStaggeredGrid(
         labels = labels,
         icons = icons,
         isHorizontal = isHorizontal,
-        showBackward = { quickNavState.showScrollToPrevious },
-        showForward = { quickNavState.showScrollToNext },
-        onScrollBack = onScrollBack,
+        showBackward = { quickNavState.showScrollToBackward },
+        showForward = { quickNavState.showScrollToForward },
+        onScrollBackward = onScrollBackward,
         onScrollForward = onScrollForward,
         indicator = {
             if (showIndicator) {

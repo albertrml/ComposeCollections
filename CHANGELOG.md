@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2026-08-05
+
+### Added
+- **Animation Presets**: Introduced `QuickNavAnimationMode` (Snap and Elastic) with built-in `AnimationSpec` presets in `QuickNavAnimationDefaults`.
+- **Custom Scroll Physics**: States now support a custom `scrollAnimationSpec` to define the "feel" of programmatic navigation.
+- **Animation Showcase**: Added a new category to the Gallery App to demonstrate the difference between Snap (precise) and Elastic (bouncy) scroll.
+
+### Changed
+- **Semantic Unification**: Unified the navigation API under direction-based terms: `Backward` and `Forward`.
+- **API Simplification**: Reduced the complexity of the `QuickNavState` interface by merging redundant properties and methods.
+- **State Evolution**: Refactored `QuickNavListState`, `QuickNavGridState`, and `QuickNavStaggeredGridState` to support the new unified API and custom animations.
+
+### Deprecated
+- **Legacy Navigation Methods**: Methods like `animateScrollToStart`, `animateScrollToEnd`, `animateScrollToPreviousPage`, and `animateScrollToNextPage` are now deprecated and scheduled for removal in v0.3.0.
+
 ## [0.2.2] - 2026-08-04
 
 ### Added

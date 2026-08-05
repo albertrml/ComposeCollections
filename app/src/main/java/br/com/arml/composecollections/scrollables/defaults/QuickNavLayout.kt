@@ -41,6 +41,16 @@ sealed class QuickNavOrientation {
 }
 
 /**
+ * Defines the navigation behavior mode.
+ */
+enum class QuickNavMode {
+    /** Navigates to the absolute start or end of the collection. */
+    Edged,
+    /** Navigates through the collection one visible viewport (page) at a time. */
+    Paged
+}
+
+/**
  * Encapsulates layout settings for QuickNav components based on their orientation.
  *
  * Use this class to define how items are arranged and aligned within the scrollable container.

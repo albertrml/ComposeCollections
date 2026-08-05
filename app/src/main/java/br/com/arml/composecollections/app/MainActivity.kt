@@ -65,6 +65,8 @@ enum class Screen {
     VerticalStaggeredPinterest,
     HorizontalStaggeredGrid,
     ListWithIndicator,
+    ElasticScroll,
+    SnapScroll,
     ThemedSample
 }
 
@@ -118,6 +120,8 @@ fun GalleryApp() {
                     Screen.VerticalStaggeredPinterest -> VerticalStaggeredPinterestSample()
                     Screen.HorizontalStaggeredGrid -> HorizontalStaggeredGridSample()
                     Screen.ListWithIndicator -> ListWithIndicatorSample(configuration.orientation)
+                    Screen.ElasticScroll -> ElasticScrollSample()
+                    Screen.SnapScroll -> SnapScrollSample()
                     Screen.ThemedSample -> ThemedNavigationSample()
                 }
             }
@@ -152,6 +156,8 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
         item { CategoryHeader("Customization") }
         items(listOf(
             "Scroll Indicators" to Screen.ListWithIndicator,
+            "Elastic Scroll Preset" to Screen.ElasticScroll,
+            "Snap Scroll Preset" to Screen.SnapScroll,
             "Custom Labels & Icons" to Screen.ThemedSample
         )) { (label, screen) ->
             SampleItem(label, onClick = { onNavigate(screen) })

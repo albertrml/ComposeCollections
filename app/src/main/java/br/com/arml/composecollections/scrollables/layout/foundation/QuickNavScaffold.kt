@@ -10,10 +10,12 @@
 
 package br.com.arml.composecollections.scrollables.layout.foundation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIcons
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
@@ -35,8 +37,9 @@ import br.com.arml.composecollections.scrollables.internal.NavigationRouter
  * @param isHorizontal The scroll orientation of the inner content.
  * @param showBackward Lambda returning true if the backward/up button should be shown.
  * @param showForward Lambda returning true if the forward/down button should be shown.
- * @param onScrollBack Callback for the backward navigation action.
+ * @param onScrollBackward Callback for the backward navigation action.
  * @param onScrollForward Callback for the forward navigation action.
+ * @param indicator Optional slot for displaying scroll progress.
  * @param container The main scrollable UI component (e.g., LazyColumn, LazyRow).
  */
 @Composable
@@ -49,14 +52,17 @@ fun QuickNavScaffold(
     isHorizontal: Boolean,
     showBackward: () -> Boolean,
     showForward: () -> Boolean,
-    onScrollBack: () -> Unit,
+    onScrollBackward: () -> Unit,
     onScrollForward: () -> Unit,
     indicator: @Composable () -> Unit = {},
     container: @Composable (Modifier) -> Unit
 ) {
     QuickNavTheme(labels = labels, icons = icons) {
         if(isHorizontal){
-            Column(modifier = modifier) {
+            Column(
+                modifier = modifier,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 indicator()
                 QuickNavNavigationFrame(
                     modifier = Modifier,
@@ -67,14 +73,17 @@ fun QuickNavScaffold(
                     isHorizontal = true,
                     showBackward = showBackward,
                     showForward = showForward,
-                    onScrollBack = onScrollBack,
+                    onScrollBackward = onScrollBackward,
                     onScrollForward = onScrollForward,
                     container = container
                 )
             }
         }
         else {
-            Row(modifier = modifier) {
+            Row(
+                modifier = modifier,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 QuickNavNavigationFrame(
                     modifier = Modifier.weight(1f),
                     isOverlay = isOverlay,
@@ -84,7 +93,7 @@ fun QuickNavScaffold(
                     isHorizontal = false,
                     showBackward = showBackward,
                     showForward = showForward,
-                    onScrollBack = onScrollBack,
+                    onScrollBackward = onScrollBackward,
                     onScrollForward = onScrollForward,
                     container = container
                 )
@@ -107,7 +116,7 @@ internal fun QuickNavNavigationFrame(
     isHorizontal: Boolean,
     showBackward: () -> Boolean,
     showForward: () -> Boolean,
-    onScrollBack: () -> Unit,
+    onScrollBackward: () -> Unit,
     onScrollForward: () -> Unit,
     container: @Composable (Modifier) -> Unit
 ) {
@@ -125,7 +134,7 @@ internal fun QuickNavNavigationFrame(
                 icons = icons,
                 showBackward = showBackward,
                 showForward = showForward,
-                onScrollBack = onScrollBack,
+                onScrollBackward = onScrollBackward,
                 onScrollForward = onScrollForward
             )
         },
@@ -140,7 +149,7 @@ internal fun QuickNavNavigationFrame(
                 icons = icons,
                 showBackward = showBackward,
                 showForward = showForward,
-                onScrollBack = onScrollBack,
+                onScrollBackward = onScrollBackward,
                 onScrollForward = onScrollForward
             )
         },
@@ -155,7 +164,7 @@ internal fun QuickNavNavigationFrame(
                 icons = icons,
                 showBackward = showBackward,
                 showForward = showForward,
-                onScrollBack = onScrollBack,
+                onScrollBackward = onScrollBackward,
                 onScrollForward = onScrollForward
             )
         },
@@ -170,7 +179,7 @@ internal fun QuickNavNavigationFrame(
                 icons = icons,
                 showBackward = showBackward,
                 showForward = showForward,
-                onScrollBack = onScrollBack,
+                onScrollBackward = onScrollBackward,
                 onScrollForward = onScrollForward
             )
         }

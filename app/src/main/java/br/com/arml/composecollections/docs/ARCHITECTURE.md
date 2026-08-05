@@ -51,3 +51,7 @@ graph TD
 - **Deferred State Reading**: Navigation visibility is passed as `() -> Boolean` lambdas. This keeps recomposition local to the `AnimatedVisibility` block, preventing the entire list from recomposing while the user scrolls.
 - **Stable Actions**: Scroll callbacks are wrapped in `remember(state, scope)` to prevent unnecessary sub-tree invalidations.
 - **Internal Protection**: Supporting components (like `NavigationRouter` and navigation panels) are marked as `internal` and hidden in the `.scrollables.internal` package to keep the public API clean and stable.
+
+---
+
+For a detailed mapping of component relationships and functional coverage, check the [API Blueprint & Technical Map](API_MAP.md).

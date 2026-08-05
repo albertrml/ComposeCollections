@@ -10,6 +10,7 @@
 
 package br.com.arml.composecollections.scrollables.state
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
@@ -17,32 +18,31 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import br.com.arml.composecollections.scrollables.defaults.QuickNavAnimationMode
+import br.com.arml.composecollections.scrollables.defaults.QuickNavMode
+import br.com.arml.composecollections.scrollables.defaults.getQuickNavAnimation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 /**
- * Default implementation of [QuickNavState] for LazyGrids.
- *
- * This class provides derived state properties to track navigation visibility
- * and methods to trigger smooth scroll animations to extremes or pages.
+ * State object for QuickNav Grid components.
  *
  * @param gridState The [LazyGridState] to be used by the grid.
+ * @param mode The navigation mode (Edged or Paged).
+ * @param animationSpec The [AnimationSpec] to be used for scroll animations.
  */
 @Stable
-class QuickNavGridState(
-    val gridState: LazyGridState
+open class QuickNavGridState(
+    val gridState: LazyGridState,
+    val mode: QuickNavMode = QuickNavMode.Edged,
+    val animationSpec: AnimationSpec<Float>? = null
 ) : QuickNavState {
-    /**
-     * Whether the "Scroll to Start" button should be displayed.
-     */
-    override val showScrollToStart by derivedStateOf {
+
+    override val showScrollToBackward by derivedStateOf {
         gridState.firstVisibleItemIndex > 0
     }
 
-    /**
-     * Whether the "Scroll to End" button should be displayed.
-     */
-    override val showScrollToEnd by derivedStateOf {
+    override val showScrollToForward by derivedStateOf {
         val layoutInfo = gridState.layoutInfo
         val totalItems = layoutInfo.totalItemsCount
         if (totalItems == 0) return@derivedStateOf false
@@ -50,15 +50,6 @@ class QuickNavGridState(
         lastVisibleItem < totalItems - 1
     }
 
-    /** Alias for [showScrollToStart]. */
-    override val showScrollToPrevious get() = showScrollToStart
-
-    /** Alias for [showScrollToEnd]. */
-    override val showScrollToNext get() = showScrollToEnd
-
-    /**
-     * The current scroll progress as a percentage from 0.0 to 1.0.
-     */
     override val scrollProgress: Float by derivedStateOf {
         val layoutInfo = gridState.layoutInfo
         val totalItems = layoutInfo.totalItemsCount
@@ -71,49 +62,54 @@ class QuickNavGridState(
         }
     }
 
-    /** Scrolls smoothly to the first item in the grid. */
-    override fun animateScrollToStart(scope: CoroutineScope) = scope.launch {
-        gridState.animateScrollToItem(0)
-    }
-
-    /** Scrolls smoothly to the last item in the grid. */
-    override fun animateScrollToEnd(scope: CoroutineScope) = scope.launch {
-        with(gridState){
-            val lastItem = layoutInfo.totalItemsCount - 1
-            if (lastItem >= 0) animateScrollToItem(lastItem)
+    override fun animateScrollToBackward(scope: CoroutineScope) = scope.launch {
+        when (mode) {
+            QuickNavMode.Edged -> gridState.animateScrollToItem(0)
+            QuickNavMode.Paged -> {
+                val visibleItemsCount = gridState.layoutInfo.visibleItemsInfo.size
+                val targetIndex = (gridState.firstVisibleItemIndex - visibleItemsCount).coerceAtLeast(0)
+                gridState.animateScrollToItem(targetIndex)
+            }
         }
     }
 
-    /** Scrolls smoothly back by approximately one visible viewport. */
-    override fun animateScrollToPreviousPage(scope: CoroutineScope) = scope.launch {
-        with(gridState){
-            val visibleItemsCount = layoutInfo.visibleItemsInfo.size
-            val targetIndex = (firstVisibleItemIndex - visibleItemsCount)
-                .coerceAtLeast(0)
-            animateScrollToItem(targetIndex)
+    override fun animateScrollToForward(scope: CoroutineScope) = scope.launch {
+        when (mode) {
+            QuickNavMode.Edged -> {
+                val lastItem = gridState.layoutInfo.totalItemsCount - 1
+                if (lastItem >= 0) gridState.animateScrollToItem(lastItem)
+            }
+            QuickNavMode.Paged -> {
+                val visibleItemsCount = gridState.layoutInfo.visibleItemsInfo.size
+                val maximumIndex = gridState.layoutInfo.totalItemsCount - 1
+                val targetIndex = (gridState.firstVisibleItemIndex + visibleItemsCount).coerceAtMost(maximumIndex)
+                if (targetIndex >= 0) { gridState.animateScrollToItem(targetIndex) }
+            }
         }
     }
 
-    /** Scrolls smoothly forward by approximately one visible viewport. */
-    override fun animateScrollToNextPage(scope: CoroutineScope) = scope.launch {
-        with(gridState){
-            val visibleItemsCount = layoutInfo.visibleItemsInfo.size
-            val maximumIndex = layoutInfo.totalItemsCount - 1
-            val targetIndex = (firstVisibleItemIndex + visibleItemsCount)
-                .coerceAtMost(maximumIndex)
-            if (targetIndex >= 0) { animateScrollToItem(targetIndex) }
-        }
-    }
+    // Deprecated bridge methods
+    @Deprecated("Use animateScrollToBackward", ReplaceWith("animateScrollToBackward(scope)"))
+    fun animateScrollToStart(scope: CoroutineScope) = animateScrollToBackward(scope)
+    @Deprecated("Use animateScrollToForward", ReplaceWith("animateScrollToForward(scope)"))
+    fun animateScrollToEnd(scope: CoroutineScope) = animateScrollToForward(scope)
+    @Deprecated("Use animateScrollToBackward", ReplaceWith("animateScrollToBackward(scope)"))
+    fun animateScrollToPreviousPage(scope: CoroutineScope) = animateScrollToBackward(scope)
+    @Deprecated("Use animateScrollToForward", ReplaceWith("animateScrollToForward(scope)"))
+    fun animateScrollToNextPage(scope: CoroutineScope) = animateScrollToForward(scope)
 }
 
 /**
- * Creates and remembers a [QuickNavGridState].
+ * Creates and remembers a [QuickNavGridState] with the specified mode and animation mode.
  */
 @Composable
 fun rememberQuickNavGridState(
-    gridState: LazyGridState = rememberLazyGridState()
+    gridState: LazyGridState = rememberLazyGridState(),
+    mode: QuickNavMode = QuickNavMode.Edged,
+    animationMode: QuickNavAnimationMode = QuickNavAnimationMode.Default
 ): QuickNavGridState {
-    return remember(gridState) {
-        QuickNavGridState(gridState)
+    val spec = getQuickNavAnimation(animationMode)
+    return remember(gridState, mode, spec) {
+        QuickNavGridState(gridState, mode, spec)
     }
 }

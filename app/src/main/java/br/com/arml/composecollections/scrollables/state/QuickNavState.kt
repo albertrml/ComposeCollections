@@ -22,24 +22,14 @@ import kotlinx.coroutines.Job
  */
 interface QuickNavState {
     /**
-     * Whether the "Scroll to Start" button should be displayed.
+     * Whether the "Backward" (Up/Start/Previous) navigation button should be displayed.
      */
-    val showScrollToStart: Boolean
+    val showScrollToBackward: Boolean
 
     /**
-     * Whether the "Scroll to End" button should be displayed.
+     * Whether the "Forward" (Down/End/Next) navigation button should be displayed.
      */
-    val showScrollToEnd: Boolean
-
-    /**
-     * Whether the "Scroll to Previous" (Backward) button should be displayed.
-     */
-    val showScrollToPrevious: Boolean
-
-    /**
-     * Whether the "Scroll to Next" (Forward) button should be displayed.
-     */
-    val showScrollToNext: Boolean
+    val showScrollToForward: Boolean
 
     /**
      * The current scroll progress as a percentage from 0.0 to 1.0.
@@ -47,30 +37,16 @@ interface QuickNavState {
     val scrollProgress: Float
 
     /**
-     * Smoothly scrolls to the starting extreme of the collection.
+     * Smoothly scrolls in the backward direction (e.g., towards the start or previous page).
      *
      * @param scope The [CoroutineScope] to launch the animation in.
      */
-    fun animateScrollToStart(scope: CoroutineScope): Job
+    fun animateScrollToBackward(scope: CoroutineScope): Job
 
     /**
-     * Smoothly scrolls to the ending extreme of the collection.
+     * Smoothly scrolls in the forward direction (e.g., towards the end or next page).
      *
      * @param scope The [CoroutineScope] to launch the animation in.
      */
-    fun animateScrollToEnd(scope: CoroutineScope): Job
-
-    /**
-     * Smoothly scrolls back by approximately one visible viewport.
-     *
-     * @param scope The [CoroutineScope] to launch the animation in.
-     */
-    fun animateScrollToPreviousPage(scope: CoroutineScope): Job
-
-    /**
-     * Smoothly scrolls forward by approximately one visible viewport.
-     *
-     * @param scope The [CoroutineScope] to launch the animation in.
-     */
-    fun animateScrollToNextPage(scope: CoroutineScope): Job
+    fun animateScrollToForward(scope: CoroutineScope): Job
 }

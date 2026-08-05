@@ -31,7 +31,7 @@ internal fun NavigationRouter(
     icons: QuickNavIcons,
     showBackward: () -> Boolean,
     showForward: () -> Boolean,
-    onScrollBack: () -> Unit,
+    onScrollBackward: () -> Unit,
     onScrollForward: () -> Unit
 ) {
     when (alignment) {
@@ -43,7 +43,7 @@ internal fun NavigationRouter(
                     isHorizontal = isHorizontal,
                     showScrollToBackward = showBackward,
                     showScrollToForward = showForward,
-                    onScrollToBackward = onScrollBack,
+                    onScrollToBackward = onScrollBackward,
                     onScrollToForward = onScrollForward
                 )
             } else {
@@ -51,7 +51,7 @@ internal fun NavigationRouter(
                     isHorizontal = isHorizontal,
                     showScrollToBackward = showBackward,
                     showScrollToForward = showForward,
-                    onScrollToBackward = onScrollBack,
+                    onScrollToBackward = onScrollBackward,
                     onScrollToForward = onScrollForward
                 )
             }
@@ -63,7 +63,7 @@ internal fun NavigationRouter(
                 contentDescription = if (isStart) labels.previousContentDescription else labels.nextContentDescription,
                 testTag = if (isStart) labels.previousTag else labels.nextTag,
                 showScrollButton = if (isStart) showBackward else showForward,
-                onScrollTo = if (isStart) onScrollBack else onScrollForward
+                onScrollTo = if (isStart) onScrollBackward else onScrollForward
             )
         }
         else -> {}
