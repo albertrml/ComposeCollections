@@ -10,12 +10,19 @@
 
 package br.com.arml.composecollections.scrollables.layout.foundation
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import br.com.arml.composecollections.R
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIcons
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
@@ -39,6 +46,8 @@ import br.com.arml.composecollections.scrollables.internal.NavigationRouter
  * @param showForward Lambda returning true if the forward/down button should be shown.
  * @param onScrollBackward Callback for the backward navigation action.
  * @param onScrollForward Callback for the forward navigation action.
+ * @param onScrollToStart Optional callback for jumping to the absolute start (Home key).
+ * @param onScrollToEnd Optional callback for jumping to the absolute end (End key).
  * @param indicator Optional slot for displaying scroll progress.
  * @param container The main scrollable UI component (e.g., LazyColumn, LazyRow).
  */
@@ -54,13 +63,28 @@ fun QuickNavScaffold(
     showForward: () -> Boolean,
     onScrollBackward: () -> Unit,
     onScrollForward: () -> Unit,
+    onScrollToStart: () -> Unit = {},
+    onScrollToEnd: () -> Unit = {},
     indicator: @Composable () -> Unit = {},
     container: @Composable (Modifier) -> Unit
 ) {
     QuickNavTheme(labels = labels, icons = icons) {
+        val keyboardModifier = Modifier
+            .onKeyEvent { event ->
+                when (event.key) {
+                    Key.PageUp -> { onScrollBackward(); true }
+                    Key.PageDown -> { onScrollForward(); true }
+                    Key.MoveHome -> { onScrollToStart(); true }
+                    Key.MoveEnd -> { onScrollToEnd(); true }
+                    else -> false
+                }
+            }
+            .focusable()
+            .testTag(stringResource(R.string.quickNav_scaffold_keyboard_testTag))
+
         if(isHorizontal){
             Column(
-                modifier = modifier,
+                modifier = modifier.then(keyboardModifier),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 indicator()
@@ -81,7 +105,7 @@ fun QuickNavScaffold(
         }
         else {
             Row(
-                modifier = modifier,
+                modifier = modifier.then(keyboardModifier),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 QuickNavNavigationFrame(
@@ -91,8 +115,8 @@ fun QuickNavScaffold(
                     labels = labels,
                     icons = icons,
                     isHorizontal = false,
-                    showBackward = showBackward,
-                    showForward = showForward,
+                    showBackward = { showBackward() },
+                    showForward = { showForward() },
                     onScrollBackward = onScrollBackward,
                     onScrollForward = onScrollForward,
                     container = container

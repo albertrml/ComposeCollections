@@ -67,6 +67,7 @@ enum class Screen {
     ListWithIndicator,
     ElasticScroll,
     SnapScroll,
+    KeyboardInput,
     ThemedSample
 }
 
@@ -122,6 +123,7 @@ fun GalleryApp() {
                     Screen.ListWithIndicator -> ListWithIndicatorSample(configuration.orientation)
                     Screen.ElasticScroll -> ElasticScrollSample()
                     Screen.SnapScroll -> SnapScrollSample()
+                    Screen.KeyboardInput -> KeyboardNavigationSample()
                     Screen.ThemedSample -> ThemedNavigationSample()
                 }
             }
@@ -151,6 +153,11 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
             "Horizontal Staggered Grid" to Screen.HorizontalStaggeredGrid
         )) { (label, screen) ->
             SampleItem(label, onClick = { onNavigate(screen) })
+        }
+
+        item { CategoryHeader("Accessibility") }
+        item {
+            SampleItem("Keyboard & D-Pad", onClick = { onNavigate(Screen.KeyboardInput) })
         }
 
         item { CategoryHeader("Customization") }

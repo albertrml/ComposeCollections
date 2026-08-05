@@ -13,12 +13,11 @@ O **ComposeCollections** foca em melhorar a experiência de navegação em lista
 
 *   **EdgedList & EdgedGrid**: Lazy containers aprimorados com botões para saltar diretamente para o **início** ou para o **fim**.
 *   **PagedList & PagedGrid**: Navegação por **páginas**, rolando exatamente a quantidade de itens visíveis na tela (viewport).
+*   **Acessibilidade & Hardware**: Suporte nativo para teclados e D-pads (TV). Use `PageUp/Down` para páginas e `Home/End` para extremos.
 *   **Scroll Presets**: Escolha entre diferentes sensações de animação: `Snap` (parada seca) ou `Elastic` (rebote fluido).
 *   **Progress Indicators**: Nova barra de progresso visual que mostra o progresso do scroll em tempo real. Ative com `showIndicator = true`.
 *   **Suporte a Staggered Grids**: Agora suportamos grades irregulares estilo Pinterest via `PagedStaggeredGrid` e `EdgedStaggeredGrid`.
 *   **Suporte Horizontal & Vertical**: Todos os componentes suportam ambas as orientações via `QuickNavLayoutSpec`.
-*   **Modo Overlay**: Botões de navegação inteligentes que podem flutuar sobre o conteúdo ou ocupar espaços dedicados.
-*   **Customização Total**: Interface `QuickNavState` para lógicas de scroll próprias e `QuickNavTheme` para estilo global.
 *   **API Protegida**: Componentes de suporte internos estão ocultos para garantir uma superfície de API limpa e estável.
 
 ## 📦 Instalação
@@ -47,7 +46,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    implementation("br.com.arml.composecollections:composecollections:0.2.3")
+    implementation("br.com.arml.composecollections:composecollections:0.2.4")
 }
 ```
 
@@ -70,7 +69,7 @@ PagedList(
 import br.com.arml.composecollections.scrollables.layout.grid.EdgedGrid
 
 EdgedGrid(
-    columns = GridCells.Fixed(3),
+    cells = GridCells.Fixed(3),
     layoutSpec = QuickNavLayoutSpec.Horizontal(),
     isOverlay = true
 ) {
@@ -102,6 +101,7 @@ Confira nossos guias:
 - [Customização e Estados](app/src/main/java/br/com/arml/composecollections/docs/CUSTOMIZATION.md)
 - [Guia de Migração (v0.1 para v0.2)](app/src/main/java/br/com/arml/composecollections/docs/MIGRATION_GUIDE.md)
 - [Primeiros Passos](app/src/main/java/br/com/arml/composecollections/docs/GETTING_STARTED.md)
+- [Mapa da API](app/src/main/java/br/com/arml/composecollections/docs/API_MAP.md)
 
 ## 🤝 Contribuição
 

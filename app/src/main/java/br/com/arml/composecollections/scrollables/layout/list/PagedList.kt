@@ -28,10 +28,10 @@ import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
 import br.com.arml.composecollections.scrollables.defaults.QuickNavAnimationMode
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIconDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIcons
-import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutDefaults
-import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutSpec
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabelDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
+import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutDefaults
+import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutSpec
 import br.com.arml.composecollections.scrollables.defaults.QuickNavMode
 import br.com.arml.composecollections.scrollables.internal.QuickNavLinearIndicator
 import br.com.arml.composecollections.scrollables.layout.foundation.QuickNavScaffold
@@ -72,6 +72,8 @@ fun PagedList(
     // Stable actions
     val onScrollBackward = remember(quickNavState, scope) { { quickNavState.animateScrollToBackward(scope); Unit } }
     val onScrollForward = remember(quickNavState, scope) { { quickNavState.animateScrollToForward(scope); Unit } }
+    val onScrollToStart = remember(quickNavState, scope) { { quickNavState.animateScrollToStart(scope); Unit } }
+    val onScrollToEnd = remember(quickNavState, scope) { { quickNavState.animateScrollToEnd(scope); Unit } }
 
     val isHorizontal = layoutSpec is QuickNavLayoutSpec.Horizontal
 
@@ -86,6 +88,8 @@ fun PagedList(
         showForward = { quickNavState.showScrollToForward },
         onScrollBackward = onScrollBackward,
         onScrollForward = onScrollForward,
+        onScrollToStart = onScrollToStart,
+        onScrollToEnd = onScrollToEnd,
         indicator = {
             if (showIndicator) {
                 QuickNavLinearIndicator(

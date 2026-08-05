@@ -73,6 +73,8 @@ fun EdgedList(
     // Stable actions
     val onScrollBackward = remember(quickNavState, scope) { { quickNavState.animateScrollToBackward(scope); Unit } }
     val onScrollForward = remember(quickNavState, scope) { { quickNavState.animateScrollToForward(scope); Unit } }
+    val onScrollToStart = remember(quickNavState, scope) { { quickNavState.animateScrollToStart(scope); Unit } }
+    val onScrollToEnd = remember(quickNavState, scope) { { quickNavState.animateScrollToEnd(scope); Unit } }
 
     val isHorizontal = layoutSpec is QuickNavLayoutSpec.Horizontal
 
@@ -87,6 +89,8 @@ fun EdgedList(
         showForward = { quickNavState.showScrollToForward },
         onScrollBackward = onScrollBackward,
         onScrollForward = onScrollForward,
+        onScrollToStart = onScrollToStart,
+        onScrollToEnd = onScrollToEnd,
         indicator = {
             if (showIndicator) {
                 QuickNavLinearIndicator(

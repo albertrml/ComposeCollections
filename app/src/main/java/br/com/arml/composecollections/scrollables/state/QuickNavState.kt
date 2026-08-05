@@ -49,4 +49,18 @@ interface QuickNavState {
      * @param scope The [CoroutineScope] to launch the animation in.
      */
     fun animateScrollToForward(scope: CoroutineScope): Job
+
+    /**
+     * Smoothly scrolls to the absolute start of the collection.
+     *
+     * @param scope The [CoroutineScope] to launch the animation in.
+     */
+    fun animateScrollToStart(scope: CoroutineScope): Job
+
+    /**
+     * Smoothly scrolls to the absolute end of the collection.
+     *
+     * @param scope The [CoroutineScope] to launch the animation in.
+     */
+    fun animateScrollToEnd(scope: CoroutineScope): Job
 }

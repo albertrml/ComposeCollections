@@ -60,28 +60,30 @@ graph TD
 
 This table shows which features are available across the public components.
 
-| Component | Orientation (V/H) | Progress Indicator | Animation Presets | Sticky Headers |
-| :--- | :---: | :---: | :---: | :---: |
-| **PagedList** | ✅ | ✅ | ✅ | ✅ |
-| **EdgedList** | ✅ | ✅ | ✅ | ✅ |
-| **PagedGrid** | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
-| **EdgedGrid** | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
-| **PagedStaggeredGrid** | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
-| **EdgedStaggeredGrid** | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
+| Component | Orientation (V/H) | Progress Indicator | Animation Presets | Hardware Shortcuts | Sticky Headers |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **PagedList** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **EdgedList** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **PagedGrid** | ✅ | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
+| **EdgedGrid** | ✅ | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
+| **PagedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
+| **EdgedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
 
 ---
 
 ## 3. Package Taxonomy & Responsibilities
 
 ### `.scrollables.layout.foundation`
-- **Goal**: Structural integrity.
-- **Key Files**: `QuickNavLayout` (Atomic placement), `QuickNavScaffold` (High-level orchestration).
-- **Dependency**: Depends only on `QuickNavTheme` and `QuickNavState`.
+- **Goal**: Structural integrity and input orchestration.
+- **Key Files**: 
+    - `QuickNavLayout`: Atomic placement of content and slots.
+    - `QuickNavScaffold`: High-level orchestration, theme injection, and **hardware key event mapping**.
+- **Dependency**: Depends on `QuickNavTheme`, `QuickNavState`, and `internal` routing.
 
 ### `.scrollables.state`
-- **Goal**: Behavioral logic.
+- **Goal**: Behavioral logic and scroll control.
 - **Key Files**: `QuickNavState` (The Contract), and concrete implementations for List, Grid, and Staggered.
-- **Design Pattern**: **State Hoisting**. Decouples "when to show buttons" from "how to draw them".
+- **Design Pattern**: **State Hoisting**. Decouples "when to show buttons" and "how to move" from the UI.
 
 ### `.scrollables.internal`
 - **Goal**: Encapsulation (The "Kitchen").
@@ -102,8 +104,10 @@ This table shows which features are available across the public components.
 ## 4. Key Data Relationships
 
 - **QuickNavTheme -> UI**: Provides colors, icons, and labels via `CompositionLocal`.
-- **QuickNavState -> Scaffold**: The Scaffold reads `showScrollToForward/Backward` to toggle visibility and calls `animateScrollTo...` on user clicks.
-- **LayoutSpec -> LazyContainer**: Controls whether the content is a `LazyColumn`, `LazyRow`, or `Grid` variant.
+- **QuickNavState -> Scaffold**: 
+    - The Scaffold reads `showScrollToForward/Backward` to toggle visibility.
+    - On user clicks or **hardware key events** (`PageUp/Down`, `Home/End`), the Scaffold triggers the corresponding `animateScrollTo...` methods.
+- **LayoutSpec -> LazyContainer**: Controls whether the content is a `LazyColumn`, `LazyRow`, or a `Grid` variant.
 
 ---
 

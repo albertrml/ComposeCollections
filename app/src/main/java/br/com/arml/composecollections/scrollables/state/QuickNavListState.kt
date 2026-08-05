@@ -64,39 +64,41 @@ open class QuickNavListState(
 
     override fun animateScrollToBackward(scope: CoroutineScope) = scope.launch {
         when (mode) {
-            QuickNavMode.Edged -> listState.animateScrollToItem(0)
-            QuickNavMode.Paged -> {
-                val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size
-                val targetIndex = (listState.firstVisibleItemIndex - visibleItemsCount).coerceAtLeast(0)
-                listState.animateScrollToItem(targetIndex)
-            }
+            QuickNavMode.Edged -> animateScrollToStart(scope)
+            QuickNavMode.Paged -> animateScrollToPreviousPage(scope)
         }
     }
 
     override fun animateScrollToForward(scope: CoroutineScope) = scope.launch {
         when (mode) {
-            QuickNavMode.Edged -> {
-                val lastItem = listState.layoutInfo.totalItemsCount - 1
-                if (lastItem >= 0) listState.animateScrollToItem(lastItem)
-            }
-            QuickNavMode.Paged -> {
-                val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size
-                val maximumIndex = listState.layoutInfo.totalItemsCount - 1
-                val targetIndex = (listState.firstVisibleItemIndex + visibleItemsCount).coerceAtMost(maximumIndex)
-                if (targetIndex >= 0) { listState.animateScrollToItem(targetIndex) }
-            }
+            QuickNavMode.Edged -> animateScrollToEnd(scope)
+            QuickNavMode.Paged -> animateScrollToNextPage(scope)
         }
     }
 
-    // Deprecated bridge methods
-    @Deprecated("Use animateScrollToBackward", ReplaceWith("animateScrollToBackward(scope)"))
-    fun animateScrollToStart(scope: CoroutineScope) = animateScrollToBackward(scope)
-    @Deprecated("Use animateScrollToForward", ReplaceWith("animateScrollToForward(scope)"))
-    fun animateScrollToEnd(scope: CoroutineScope) = animateScrollToForward(scope)
-    @Deprecated("Use animateScrollToBackward", ReplaceWith("animateScrollToBackward(scope)"))
-    fun animateScrollToPreviousPage(scope: CoroutineScope) = animateScrollToBackward(scope)
-    @Deprecated("Use animateScrollToForward", ReplaceWith("animateScrollToForward(scope)"))
-    fun animateScrollToNextPage(scope: CoroutineScope) = animateScrollToForward(scope)
+    override fun animateScrollToStart(scope: CoroutineScope) = scope.launch {
+        listState.animateScrollToItem(0)
+    }
+
+    override fun animateScrollToEnd(scope: CoroutineScope) = scope.launch {
+        val lastItem = listState.layoutInfo.totalItemsCount - 1
+        if (lastItem >= 0) listState.animateScrollToItem(lastItem)
+    }
+
+    /** Scrolls smoothly back by approximately one visible viewport. */
+    internal fun animateScrollToPreviousPage(scope: CoroutineScope) = scope.launch {
+        val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size
+        val targetIndex = (listState.firstVisibleItemIndex - visibleItemsCount).coerceAtLeast(0)
+        listState.animateScrollToItem(targetIndex)
+    }
+
+    /** Scrolls smoothly forward by approximately one visible viewport. */
+    internal fun animateScrollToNextPage(scope: CoroutineScope) = scope.launch {
+        val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size
+        val maximumIndex = listState.layoutInfo.totalItemsCount - 1
+        val targetIndex = (listState.firstVisibleItemIndex + visibleItemsCount).coerceAtMost(maximumIndex)
+        if (targetIndex >= 0) { listState.animateScrollToItem(targetIndex) }
+    }
 }
 
 /**

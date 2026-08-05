@@ -54,8 +54,8 @@ import br.com.arml.composecollections.scrollables.state.rememberQuickNavGridStat
  * @param animationMode The scroll animation preset.
  * @param isOverlay If true, navigation buttons float over the grid content.
  * @param showIndicator If true, displays a scroll progress indicator.
- * @param labels Labels and tags for navigation buttons.
- * @param icons Icon set for navigation buttons.
+ * @param labels Labels and tags for navigation buttons. Defaults to themed or edged defaults.
+ * @param icons Icon set for navigation buttons. Defaults to standard theme icons.
  * @param content The content of the grid.
  */
 @Composable
@@ -78,6 +78,8 @@ fun EdgedGrid(
     // Stable actions
     val onScrollBackward = remember(quickNavState, scope) { { quickNavState.animateScrollToBackward(scope); Unit } }
     val onScrollForward = remember(quickNavState, scope) { { quickNavState.animateScrollToForward(scope); Unit } }
+    val onScrollToStart = remember(quickNavState, scope) { { quickNavState.animateScrollToStart(scope); Unit } }
+    val onScrollToEnd = remember(quickNavState, scope) { { quickNavState.animateScrollToEnd(scope); Unit } }
 
     val isHorizontal = layoutSpec is QuickNavLayoutSpec.Horizontal
 
@@ -92,6 +94,8 @@ fun EdgedGrid(
         showForward = { quickNavState.showScrollToForward },
         onScrollBackward = onScrollBackward,
         onScrollForward = onScrollForward,
+        onScrollToStart = onScrollToStart,
+        onScrollToEnd = onScrollToEnd,
         indicator = {
             if (showIndicator) {
                 QuickNavLinearIndicator(

@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2026-08-05
+
+### Added
+- **A11y & Hardware Input**: Full support for physical keyboards and D-pads (TV/Desktop).
+- **Universal Shortcuts**:
+    - `PageUp` / `PageDown`: Navigate through pages.
+    - `Home` / `End`: Jump directly to the start or end of the collection.
+- **State Expansion**: Added `animateScrollToStart` and `animateScrollToEnd` to `QuickNavState` for precise absolute navigation.
+- **Accessibility Sample**: Added a new demonstration screen in the Gallery App for testing hardware peripherals.
+
+### Fixed
+- **Input Priority**: Switched to `onPreviewKeyEvent` in the Scaffold to ensure the library's navigation logic has priority over default component behaviors.
+- **Focus Management**: Ensured the root container is focusable, enabling immediate interaction with hardware devices.
+
 ## [0.2.3] - 2026-08-05
 
 ### Added
