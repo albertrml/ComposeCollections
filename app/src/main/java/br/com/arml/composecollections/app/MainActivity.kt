@@ -41,7 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import br.com.arml.composecollections.scrollables.samples.scrollables.*
+import br.com.arml.composecollections.collections.samples.collections.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +85,7 @@ fun GalleryApp() {
                     title = {
                         Text(
                             text = when (currentScreen) {
-                                Screen.Dashboard -> "QuickNav Gallery"
+                                Screen.Dashboard -> "Collection Gallery"
                                 else -> currentScreen.name.replace("([a-z])([A-Z])".toRegex(), "$1 $2")
                             }
                         )
@@ -163,11 +163,17 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
             SampleItem("Keyboard & D-Pad", onClick = { onNavigate(Screen.KeyboardInput) })
         }
 
+        item { CategoryHeader("Animation Presets") }
+        items(listOf(
+            "Elastic Scroll" to Screen.ElasticScroll,
+            "Snap Scroll" to Screen.SnapScroll
+        )) { (label, screen) ->
+            SampleItem(label, onClick = { onNavigate(screen) })
+        }
+
         item { CategoryHeader("Customization") }
         items(listOf(
             "Scroll Indicators" to Screen.ListWithIndicator,
-            "Elastic Scroll Preset" to Screen.ElasticScroll,
-            "Snap Scroll Preset" to Screen.SnapScroll,
             "Custom Labels & Icons" to Screen.ThemedSample
         )) { (label, screen) ->
             SampleItem(label, onClick = { onNavigate(screen) })

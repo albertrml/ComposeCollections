@@ -9,29 +9,29 @@ The library follows a strict layered approach to ensure consistency and reuse.
 ```mermaid
 graph TD
     subgraph "Public API (Specialized Components)"
-        List[PagedList / EdgedList]
-        Grid[PagedGrid / EdgedGrid]
-        Staggered[PagedStaggeredGrid / EdgedStaggeredGrid]
+        List[CollectionPagedList / CollectionEdgedList]
+        Grid[CollectionPagedGrid / CollectionEdgedGrid]
+        Staggered[CollectionPagedStaggeredGrid / CollectionEdgedStaggeredGrid]
     end
 
     subgraph "Foundation Layer (Layout Engine)"
-        Scaffold[QuickNavScaffold - Template]
-        Frame[QuickNavNavigationFrame - Assembler]
-        Layout[QuickNavLayout - Motor]
+        Scaffold[CollectionScaffold - Template]
+        Frame[CollectionNavigationFrame - Assembler]
+        Layout[CollectionLayout - Motor]
     end
 
     subgraph "State System (Control Logic)"
-        StateI[QuickNavState - Interface]
-        StateList[QuickNavListState]
-        StateGrid[QuickNavGridState]
-        StateStag[QuickNavStaggeredGridState]
+        StateI[CollectionState - Interface]
+        StateList[CollectionListState]
+        StateGrid[CollectionGridState]
+        StateStag[CollectionStaggeredGridState]
     end
 
     subgraph "Theming & Defaults"
-        Theme[QuickNavTheme]
-        Spec[QuickNavLayoutSpec]
-        Labels[QuickNavLabels]
-        Icons[QuickNavIcons]
+        Theme[CollectionTheme]
+        Spec[CollectionLayoutSpec]
+        Labels[CollectionLabels]
+        Icons[CollectionIcons]
     end
 
     %% Relationships
@@ -62,52 +62,52 @@ This table shows which features are available across the public components.
 
 | Component | Orientation (V/H) | Progress Indicator | Animation Presets | Hardware Shortcuts | Sticky Headers |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **PagedList** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **EdgedList** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **PagedGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **EdgedGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **PagedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **EdgedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **CollectionPagedList** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **CollectionEdgedList** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **CollectionPagedGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **CollectionEdgedGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **CollectionPagedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **CollectionEdgedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ---
 
 ## 3. Package Taxonomy & Responsibilities
 
-### `.scrollables.layout.foundation`
+### `.collections.layout.foundation`
 - **Goal**: Structural integrity and input orchestration.
 - **Key Files**: 
-    - `QuickNavLayout`: Atomic placement of content and slots.
-    - `QuickNavScaffold`: High-level orchestration, theme injection, and **hardware key event mapping**.
-- **Dependency**: Depends on `QuickNavTheme`, `QuickNavState`, and `internal` routing.
+    - `CollectionLayout`: Atomic placement of content and slots.
+    - `CollectionScaffold`: High-level orchestration, theme injection, and **hardware key event mapping**.
+- **Dependency**: Depends on `CollectionTheme`, `CollectionState`, and `internal` routing.
 
-### `.scrollables.state`
+### `.collections.state`
 - **Goal**: Behavioral logic and scroll control.
-- **Key Files**: `QuickNavState` (The Contract), and concrete implementations for List, Grid, and Staggered.
+- **Key Files**: `CollectionState` (The Contract), and concrete implementations for List, Grid, and Staggered.
 - **Design Pattern**: **State Hoisting**. Decouples "when to show buttons" and "how to move" from the UI.
 
-### `.scrollables.internal`
+### `.collections.internal`
 - **Goal**: Encapsulation (The "Kitchen").
-- **Responsibilities**: Routing buttons (`NavigationRouter`), icon resolution, and low-level panel assembly.
+- **Responsibilities**: Routing buttons (`CollectionRouter`), icon resolution, and low-level panel assembly.
 - **Access**: Marked as `internal`. Not visible to library consumers.
 
-### `.scrollables.defaults`
+### `.collections.defaults`
 - **Goal**: Global configuration and presets.
 - **Key Files**: 
-    - `QuickNavLayout.kt`: Navigation alignments and behavior modes (`Edged`, `Paged`).
-    - `QuickNavAnimation.kt`: Animation modes (`Snap`, `Elastic`) and physics presets.
-    - `TransitionDefaults.kt`: Visibility transitions (`fadeIn`, `fadeOut`).
-    - `QuickNavTheme.kt`: Main theming engine and `CompositionLocal` providers.
-    - `QuickNavLabelDefaults.kt`: Default localized strings and test tags.
+    - `CollectionLayout.kt`: Navigation alignments and behavior modes (`Edged`, `Paged`).
+    - `CollectionAnimation.kt`: Animation modes (`Snap`, `Elastic`) and physics presets.
+    - `CollectionVisibilityTransitions.kt`: Visibility transitions (`fadeIn`, `fadeOut`).
+    - `CollectionTheme.kt`: Main theming engine and `CompositionLocal` providers.
+    - `CollectionLabelDefaults.kt`: Default localized strings and test tags.
 
 ---
 
 ## 4. Key Data Relationships
 
-- **QuickNavTheme -> UI**: Provides colors, icons, and labels via `CompositionLocal`.
-- **QuickNavState -> Scaffold**: 
-    - The Scaffold consumes the entire `QuickNavState` object to manage visibility and navigation.
+- **CollectionTheme -> UI**: Provides colors, icons, and labels via `CompositionLocal`.
+- **CollectionState -> Scaffold**: 
+    - The Scaffold consumes the entire `CollectionState` object to manage visibility and navigation.
     - On user clicks or **hardware key events** (`PageUp/Down`, `Home/End`), the Scaffold triggers the corresponding `animateScrollTo...` methods.
-- **LayoutSpec -> LazyContainer**: Controls whether the content is a `LazyColumn`, `LazyRow`, or a `Grid` variant.
+- **CollectionLayoutSpec -> LazyContainer**: Controls whether the content is a `LazyColumn`, `LazyRow`, or a `Grid` variant.
 
 ---
 
@@ -115,6 +115,6 @@ This table shows which features are available across the public components.
 
 If you want to customize the library, here is where you should look:
 
-1. **Visual Customization**: Use `QuickNavTheme` in the `.defaults` package.
-2. **New Container Support**: Use `QuickNavScaffold` in the `.foundation` package.
-3. **Custom Navigation Logic**: Implement `QuickNavState` in the `.state` package.
+1. **Visual Customization**: Use `CollectionTheme` in the `.defaults` package.
+2. **New Container Support**: Use `CollectionScaffold` in the `.foundation` package.
+3. **Custom Navigation Logic**: Implement `CollectionState` in the `.state` package.

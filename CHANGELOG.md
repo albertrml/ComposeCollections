@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.7] - 2026-08-06
+
+### Added
+- **Global Rebranding**: The library has officially transitioned from "QuickNav" to **ComposeCollections**, evolving from a utility into a comprehensive collection container framework.
+- **Structural Cleanup**: All packages migrated to `br.com.arml.composecollections.collections.*` for a cleaner, domain-focused architecture.
+- **Component Evolution**: Renamed all core components (e.g., `CollectionScaffold`, `CollectionPagedList`, `CollectionGridState`) to reflect the new identity.
+
+### Changed
+- **Parameter Normalization**: Standardized the parameter order across all public Composables to align with official Android Jetpack Compose API Guidelines (Modifier -> State -> Config -> Visuals -> Content).
+- **Consolidated State API**: Refactored `CollectionScaffold` to consume the entire `CollectionState` object, significantly reducing parameter bloat and improving type safety.
+- **Stricter Deprecation Policy**: Permanently removed all methods and properties marked as deprecated in versions 0.2.3 and 0.2.6.
+
+### Fixed
+- **Layout Tightness**: Optimized the space distribution in horizontal lists and grids. The containers now "tightly" embrace their content by default, preventing excessive whitespace in large viewports and ensuring navigation buttons remain close to the collection.
+
 ## [0.2.6] - 2026-08-06
 
 ### Added

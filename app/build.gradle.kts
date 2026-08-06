@@ -6,7 +6,7 @@ plugins {
     `maven-publish`
 }
 
-val libraryVersion = "0.2.6"
+val libraryVersion = "0.2.7"
 
 android {
     namespace = "br.com.arml.composecollections"
@@ -16,7 +16,7 @@ android {
         applicationId = "br.com.arml.composecollections"
         minSdk = 24
         targetSdk = 37
-        versionCode = 9
+        versionCode = 10
         versionName = libraryVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
