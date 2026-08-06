@@ -12,7 +12,6 @@ package br.com.arml.composecollections.scrollables.defaults
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
 
 /**
  * Defines the placement of navigation controls relative to the scrollable content.
@@ -63,7 +62,7 @@ sealed class QuickNavLayoutSpec {
      * @property alignment The horizontal alignment of items within the column.
      */
     data class Vertical(
-        val arrangement: Arrangement.Vertical = Arrangement.spacedBy(12.dp),
+        val arrangement: Arrangement.Vertical = Arrangement.spacedBy(QuickNavDimensionDefaults.default.itemSpacing),
         val alignment: Alignment.Horizontal = Alignment.Start
     ) : QuickNavLayoutSpec()
 
@@ -74,7 +73,7 @@ sealed class QuickNavLayoutSpec {
      * @property alignment The vertical alignment of items within the row.
      */
     data class Horizontal(
-        val arrangement: Arrangement.Horizontal = Arrangement.spacedBy(12.dp),
+        val arrangement: Arrangement.Horizontal = Arrangement.spacedBy(QuickNavDimensionDefaults.default.itemSpacing),
         val alignment: Alignment.Vertical = Alignment.Top
     ) : QuickNavLayoutSpec()
 }

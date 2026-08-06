@@ -72,6 +72,8 @@ val LocalQuickNavLabels = staticCompositionLocalOf<QuickNavLabels?> { null }
 val LocalQuickNavIcons = staticCompositionLocalOf { QuickNavIconDefaults.default }
 /** CompositionLocal for accessing [QuickNavTransitions]. Defaults to standard fade/slide. */
 val LocalQuickNavTransitions = staticCompositionLocalOf { QuickNavTransitionDefaults.default }
+/** CompositionLocal for accessing [QuickNavDimensions]. Defaults to M3 tokens. */
+val LocalQuickNavDimensions = staticCompositionLocalOf { QuickNavDimensionDefaults.default }
 
 /**
  * Theme wrapper for QuickNav components.
@@ -82,6 +84,7 @@ val LocalQuickNavTransitions = staticCompositionLocalOf { QuickNavTransitionDefa
  * @param labels Custom labels/tags (optional).
  * @param icons Custom icon set (optional).
  * @param transitions Custom visibility transitions (optional).
+ * @param dimensions Custom dimension tokens (optional).
  * @param content The UI content that will consume these theme settings.
  */
 @Composable
@@ -89,12 +92,14 @@ fun QuickNavTheme(
     labels: QuickNavLabels? = null,
     icons: QuickNavIcons = QuickNavIconDefaults.default,
     transitions: QuickNavTransitions = QuickNavTransitionDefaults.default,
+    dimensions: QuickNavDimensions = QuickNavDimensionDefaults.default,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
         LocalQuickNavLabels provides labels,
         LocalQuickNavIcons provides icons,
         LocalQuickNavTransitions provides transitions,
+        LocalQuickNavDimensions provides dimensions,
         content = content
     )
 }
@@ -117,4 +122,9 @@ object QuickNavTheme {
     val transitions: QuickNavTransitions
         @Composable
         get() = LocalQuickNavTransitions.current
+
+    /** Returns the current [QuickNavDimensions] from the theme. */
+    val dimensions: QuickNavDimensions
+        @Composable
+        get() = LocalQuickNavDimensions.current
 }

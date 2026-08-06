@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import br.com.arml.composecollections.scrollables.defaults.QuickNavTheme
 
 /**
  * A layout scaffold that organizes content and navigation controls.
@@ -51,6 +52,7 @@ fun QuickNavLayout(
     contentRight: @Composable (Modifier) -> Unit = {},
     content: @Composable (PaddingValues) -> Unit = {},
 ) {
+    val panelSpacing = QuickNavTheme.dimensions.panelToContentSpacing
     if (isOverlay) {
         Box(
             modifier = modifier,
@@ -66,14 +68,14 @@ fun QuickNavLayout(
         Column(
             modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(panelSpacing)
         ) {
             contentTop(Modifier)
             Row(
                 modifier = Modifier
                     .weight(1f, fill = false)
                     .wrapContentHeight(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(panelSpacing),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 contentLeft(Modifier)

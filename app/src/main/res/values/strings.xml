@@ -19,4 +19,5 @@
 
     <string name="quickNav_indicator_testTag">QuickNavIndicatorTestTag</string>
     <string name="quickNav_scaffold_keyboard_testTag">QuickNavScaffoldKeyboardTestTag</string>
+    <string name="quickNav_scaffold_header_overlay_testTag">QuickNavScaffoldHeaderOverlayTestTag</string>
 </resources>

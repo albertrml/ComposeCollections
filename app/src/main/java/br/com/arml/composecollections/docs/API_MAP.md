@@ -64,10 +64,10 @@ This table shows which features are available across the public components.
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **PagedList** | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **EdgedList** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **PagedGrid** | ✅ | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
-| **EdgedGrid** | ✅ | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
-| **PagedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
-| **EdgedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ❌ (Compose restriction) |
+| **PagedGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **EdgedGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **PagedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **EdgedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ---
 

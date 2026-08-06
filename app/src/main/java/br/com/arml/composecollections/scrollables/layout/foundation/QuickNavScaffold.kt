@@ -12,18 +12,22 @@ package br.com.arml.composecollections.scrollables.layout.foundation
 
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import br.com.arml.composecollections.R
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
+import br.com.arml.composecollections.scrollables.defaults.QuickNavDimensions
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIcons
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
 import br.com.arml.composecollections.scrollables.defaults.QuickNavTheme
@@ -41,6 +45,7 @@ import br.com.arml.composecollections.scrollables.internal.NavigationRouter
  * @param navigationAlignment Where to place the navigation controls (Top, Bottom, End, etc.).
  * @param labels Labels and tags for navigation buttons.
  * @param icons Icon set for navigation buttons.
+ * @param dimens Dimension tokens for spacing and sizing.
  * @param isHorizontal The scroll orientation of the inner content.
  * @param showBackward Lambda returning true if the backward/up button should be shown.
  * @param showForward Lambda returning true if the forward/down button should be shown.
@@ -49,6 +54,7 @@ import br.com.arml.composecollections.scrollables.internal.NavigationRouter
  * @param onScrollToStart Optional callback for jumping to the absolute start (Home key).
  * @param onScrollToEnd Optional callback for jumping to the absolute end (End key).
  * @param indicator Optional slot for displaying scroll progress.
+ * @param topOverlay Optional slot for floating content at the top (e.g., sticky headers for Grid).
  * @param container The main scrollable UI component (e.g., LazyColumn, LazyRow).
  */
 @Composable
@@ -58,19 +64,24 @@ fun QuickNavScaffold(
     navigationAlignment: NavigationAlignment = NavigationAlignment.Bottom,
     labels: QuickNavLabels,
     icons: QuickNavIcons,
+    dimens: QuickNavDimensions,
     isHorizontal: Boolean,
-    showBackward: () -> Boolean,
-    showForward: () -> Boolean,
-    onScrollBackward: () -> Unit,
-    onScrollForward: () -> Unit,
+    showBackward: () -> Boolean = { false },
+    showForward: () -> Boolean = { false },
+    onScrollBackward: () -> Unit = {},
+    onScrollForward: () -> Unit = {},
     onScrollToStart: () -> Unit = {},
     onScrollToEnd: () -> Unit = {},
     indicator: @Composable () -> Unit = {},
-    container: @Composable (Modifier) -> Unit
+    topOverlay: @Composable () -> Unit = {},
+    container: @Composable (Modifier) -> Unit,
 ) {
-    QuickNavTheme(labels = labels, icons = icons) {
+    QuickNavTheme(labels = labels, icons = icons, dimensions = dimens) {
+        val dimensions = QuickNavTheme.dimensions
         val keyboardModifier = Modifier
-            .onKeyEvent { event ->
+            .onPreviewKeyEvent { event ->
+                if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                
                 when (event.key) {
                     Key.PageUp -> { onScrollBackward(); true }
                     Key.PageDown -> { onScrollForward(); true }
@@ -85,42 +96,48 @@ fun QuickNavScaffold(
         if(isHorizontal){
             Column(
                 modifier = modifier.then(keyboardModifier),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(dimensions.panelToContentSpacing)
             ) {
                 indicator()
-                QuickNavNavigationFrame(
-                    modifier = Modifier,
-                    isOverlay = isOverlay,
-                    navigationAlignment = navigationAlignment,
-                    labels = labels,
-                    icons = icons,
-                    isHorizontal = true,
-                    showBackward = showBackward,
-                    showForward = showForward,
-                    onScrollBackward = onScrollBackward,
-                    onScrollForward = onScrollForward,
-                    container = container
-                )
+                Box {
+                    QuickNavNavigationFrame(
+                        modifier = Modifier,
+                        isOverlay = isOverlay,
+                        navigationAlignment = navigationAlignment,
+                        isHorizontal = true,
+                        showBackward = showBackward,
+                        showForward = showForward,
+                        onScrollBackward = onScrollBackward,
+                        onScrollForward = onScrollForward,
+                        container = container
+                    )
+                    Box(Modifier.testTag(stringResource(R.string.quickNav_scaffold_header_overlay_testTag))) {
+                        topOverlay()
+                    }
+                }
             }
         }
         else {
             Row(
                 modifier = modifier.then(keyboardModifier),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(dimensions.panelToContentSpacing)
             ) {
-                QuickNavNavigationFrame(
-                    modifier = Modifier.weight(1f),
-                    isOverlay = isOverlay,
-                    navigationAlignment = navigationAlignment,
-                    labels = labels,
-                    icons = icons,
-                    isHorizontal = false,
-                    showBackward = { showBackward() },
-                    showForward = { showForward() },
-                    onScrollBackward = onScrollBackward,
-                    onScrollForward = onScrollForward,
-                    container = container
-                )
+                Box(Modifier.weight(1f)) {
+                    QuickNavNavigationFrame(
+                        modifier = Modifier.fillMaxWidth(),
+                        isOverlay = isOverlay,
+                        navigationAlignment = navigationAlignment,
+                        isHorizontal = false,
+                        showBackward = { showBackward() },
+                        showForward = { showForward() },
+                        onScrollBackward = onScrollBackward,
+                        onScrollForward = onScrollForward,
+                        container = container
+                    )
+                    Box(Modifier.testTag(stringResource(R.string.quickNav_scaffold_header_overlay_testTag))) {
+                        topOverlay()
+                    }
+                }
                 indicator()
             }
         }
@@ -135,8 +152,6 @@ internal fun QuickNavNavigationFrame(
     modifier: Modifier = Modifier,
     isOverlay: Boolean = false,
     navigationAlignment: NavigationAlignment = NavigationAlignment.Bottom,
-    labels: QuickNavLabels,
-    icons: QuickNavIcons,
     isHorizontal: Boolean,
     showBackward: () -> Boolean,
     showForward: () -> Boolean,
@@ -154,8 +169,6 @@ internal fun QuickNavNavigationFrame(
                 secondaryTarget = NavigationAlignment.Vertical,
                 isHorizontal = isHorizontal,
                 isStart = true,
-                labels = labels,
-                icons = icons,
                 showBackward = showBackward,
                 showForward = showForward,
                 onScrollBackward = onScrollBackward,
@@ -169,8 +182,6 @@ internal fun QuickNavNavigationFrame(
                 secondaryTarget = NavigationAlignment.Vertical,
                 isHorizontal = isHorizontal,
                 isStart = false,
-                labels = labels,
-                icons = icons,
                 showBackward = showBackward,
                 showForward = showForward,
                 onScrollBackward = onScrollBackward,
@@ -184,8 +195,6 @@ internal fun QuickNavNavigationFrame(
                 secondaryTarget = NavigationAlignment.Horizontal,
                 isHorizontal = isHorizontal,
                 isStart = true,
-                labels = labels,
-                icons = icons,
                 showBackward = showBackward,
                 showForward = showForward,
                 onScrollBackward = onScrollBackward,
@@ -199,8 +208,6 @@ internal fun QuickNavNavigationFrame(
                 secondaryTarget = NavigationAlignment.Horizontal,
                 isHorizontal = isHorizontal,
                 isStart = false,
-                labels = labels,
-                icons = icons,
                 showBackward = showBackward,
                 showForward = showForward,
                 onScrollBackward = onScrollBackward,

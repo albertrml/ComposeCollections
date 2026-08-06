@@ -12,8 +12,7 @@ package br.com.arml.composecollections.scrollables.internal
 
 import androidx.compose.runtime.Composable
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
-import br.com.arml.composecollections.scrollables.defaults.QuickNavIcons
-import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
+import br.com.arml.composecollections.scrollables.defaults.QuickNavTheme
 
 /**
  * Internal component that routes the appropriate navigation panel based on alignment.
@@ -27,13 +26,14 @@ internal fun NavigationRouter(
     secondaryTarget: NavigationAlignment,
     isHorizontal: Boolean,
     isStart: Boolean,
-    labels: QuickNavLabels,
-    icons: QuickNavIcons,
     showBackward: () -> Boolean,
     showForward: () -> Boolean,
     onScrollBackward: () -> Unit,
     onScrollForward: () -> Unit
 ) {
+    val labels = QuickNavTheme.labels
+    val icons = QuickNavTheme.icons
+
     when (alignment) {
         target -> {
             val useVerticalPanel = target == NavigationAlignment.Start || target == NavigationAlignment.End

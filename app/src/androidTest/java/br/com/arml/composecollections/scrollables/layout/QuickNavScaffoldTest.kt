@@ -21,6 +21,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
+import br.com.arml.composecollections.scrollables.defaults.QuickNavDimensionDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIconDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
 import br.com.arml.composecollections.scrollables.layout.foundation.QuickNavScaffold
@@ -48,17 +49,17 @@ class QuickNavScaffoldTest {
         
         composeTestRule.setContent {
             QuickNavScaffold(
+                navigationAlignment = NavigationAlignment.Top,
                 labels = testLabels,
                 icons = QuickNavIconDefaults.default,
+                dimens = QuickNavDimensionDefaults.default,
                 isHorizontal = false,
-                navigationAlignment = NavigationAlignment.Top,
                 showBackward = { true },
-                showForward = { false },
                 onScrollBackward = { clicked = true },
-                onScrollForward = {}
-            ) {
-                Box(Modifier.fillMaxSize()) { Text("Content") }
-            }
+                container = {
+                    Box(Modifier.fillMaxSize()) { Text("Content") }
+                },
+            )
         }
 
         // Verify content and button presence

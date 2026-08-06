@@ -64,6 +64,7 @@ enum class Screen {
     HorizontalPagedGrid,
     VerticalStaggeredPinterest,
     HorizontalStaggeredGrid,
+    GridStickyHeaders,
     ListWithIndicator,
     ElasticScroll,
     SnapScroll,
@@ -120,6 +121,7 @@ fun GalleryApp() {
                     Screen.HorizontalPagedGrid -> HorizontalPagedGridSample()
                     Screen.VerticalStaggeredPinterest -> VerticalStaggeredPinterestSample()
                     Screen.HorizontalStaggeredGrid -> HorizontalStaggeredGridSample()
+                    Screen.GridStickyHeaders -> GridStickyHeaderSample()
                     Screen.ListWithIndicator -> ListWithIndicatorSample(configuration.orientation)
                     Screen.ElasticScroll -> ElasticScrollSample()
                     Screen.SnapScroll -> SnapScrollSample()
@@ -150,7 +152,8 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
             "Vertical Edged Grid" to Screen.VerticalEdgedGrid,
             "Horizontal Paged Grid" to Screen.HorizontalPagedGrid,
             "Vertical Staggered Pinterest" to Screen.VerticalStaggeredPinterest,
-            "Horizontal Staggered Grid" to Screen.HorizontalStaggeredGrid
+            "Horizontal Staggered Grid" to Screen.HorizontalStaggeredGrid,
+            "Grid Sticky Headers" to Screen.GridStickyHeaders
         )) { (label, screen) ->
             SampleItem(label, onClick = { onNavigate(screen) })
         }

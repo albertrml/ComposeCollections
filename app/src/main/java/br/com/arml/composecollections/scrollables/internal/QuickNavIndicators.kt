@@ -24,8 +24,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import br.com.arml.composecollections.R
+import br.com.arml.composecollections.scrollables.defaults.QuickNavTheme
 
 /**
  * A subtle linear progress indicator for scroll progress.
@@ -41,14 +41,16 @@ internal fun QuickNavLinearIndicator(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.primary
 ) {
+    val dimensions = QuickNavTheme.dimensions
+    
     Box(
         modifier = modifier
             .testTag(stringResource(R.string.quickNav_indicator_testTag))
             .clip(CircleShape)
             .background(color.copy(alpha = 0.2f))
             .then(
-                if (isHorizontal) Modifier.height(4.dp).fillMaxWidth()
-                else Modifier.width(4.dp).fillMaxHeight()
+                if (isHorizontal) Modifier.height(dimensions.indicatorThickness).fillMaxWidth()
+                else Modifier.width(dimensions.indicatorThickness).fillMaxHeight()
             )
     ) {
         Box(

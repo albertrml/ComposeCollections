@@ -11,24 +11,27 @@
 package br.com.arml.composecollections.scrollables.layout.grid
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import br.com.arml.composecollections.R
 import br.com.arml.composecollections.scrollables.defaults.LocalQuickNavLabels
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
 import br.com.arml.composecollections.scrollables.defaults.QuickNavAnimationMode
+import br.com.arml.composecollections.scrollables.defaults.QuickNavDimensionDefaults
+import br.com.arml.composecollections.scrollables.defaults.QuickNavDimensions
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIconDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIcons
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutDefaults
@@ -36,8 +39,11 @@ import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutSpec
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabelDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
 import br.com.arml.composecollections.scrollables.defaults.QuickNavMode
+import br.com.arml.composecollections.scrollables.defaults.QuickNavTheme
 import br.com.arml.composecollections.scrollables.internal.QuickNavLinearIndicator
 import br.com.arml.composecollections.scrollables.layout.foundation.QuickNavScaffold
+import br.com.arml.composecollections.scrollables.layout.grid.scope.QuickNavStaggeredGridScope
+import br.com.arml.composecollections.scrollables.layout.grid.scope.QuickNavStaggeredGridScopeImpl
 import br.com.arml.composecollections.scrollables.state.QuickNavState
 import br.com.arml.composecollections.scrollables.state.rememberQuickNavStaggeredGridState
 
@@ -56,7 +62,8 @@ import br.com.arml.composecollections.scrollables.state.rememberQuickNavStaggere
  * @param showIndicator If true, displays a scroll progress indicator.
  * @param labels Labels and tags for navigation buttons. Defaults to themed or edged defaults.
  * @param icons Icon set for navigation buttons. Defaults to standard theme icons.
- * @param content The content of the staggered grid.
+ * @param dimens Dimension tokens for spacing and sizing.
+ * @param content The content of the staggered grid, defined using [br.com.arml.composecollections.scrollables.layout.grid.scope.QuickNavStaggeredGridScope].
  */
 @Composable
 fun EdgedStaggeredGrid(
@@ -71,9 +78,11 @@ fun EdgedStaggeredGrid(
     showIndicator: Boolean = false,
     labels: QuickNavLabels = LocalQuickNavLabels.current ?: QuickNavLabelDefaults.edgedLabels(),
     icons: QuickNavIcons = QuickNavIconDefaults.default,
-    content: LazyStaggeredGridScope.() -> Unit
+    dimens: QuickNavDimensions = QuickNavDimensionDefaults.default,
+    content: QuickNavStaggeredGridScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val gridScope = remember(content) { QuickNavStaggeredGridScopeImpl().apply(content) }
 
     // Stable actions
     val onScrollBackward = remember(quickNavState, scope) { { quickNavState.animateScrollToBackward(scope); Unit } }
@@ -83,12 +92,19 @@ fun EdgedStaggeredGrid(
 
     val isHorizontal = layoutSpec is QuickNavLayoutSpec.Horizontal
 
+    val currentHeaderIndex by remember {
+        derivedStateOf {
+            gridScope.headerIndexes.lastOrNull { it <= gridState.firstVisibleItemIndex }
+        }
+    }
+
     QuickNavScaffold(
         modifier = modifier.testTag(stringResource(R.string.quickNavList_component_testTag)),
         isOverlay = isOverlay,
         navigationAlignment = navigationAlignment,
         labels = labels,
         icons = icons,
+        dimens = dimens,
         isHorizontal = isHorizontal,
         showBackward = { quickNavState.showScrollToBackward },
         showForward = { quickNavState.showScrollToForward },
@@ -103,25 +119,51 @@ fun EdgedStaggeredGrid(
                     isHorizontal = isHorizontal
                 )
             }
-        }
-    ) { containerModifier ->
-        when (layoutSpec) {
-            is QuickNavLayoutSpec.Vertical -> LazyVerticalStaggeredGrid(
-                columns = cells,
-                modifier = containerModifier.fillMaxWidth(),
-                state = gridState,
-                verticalItemSpacing = 12.dp,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                content = content
-            )
-            is QuickNavLayoutSpec.Horizontal -> LazyHorizontalStaggeredGrid(
-                rows = cells,
-                modifier = containerModifier.fillMaxWidth(),
-                state = gridState,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalItemSpacing = 12.dp,
-                content = content
-            )
-        }
-    }
+        },
+        topOverlay = {
+            currentHeaderIndex?.let { index ->
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    gridScope.items[index].content(null)
+                }
+            }
+        },
+        container = { containerModifier ->
+            val dimensions = QuickNavTheme.dimensions
+            when (layoutSpec) {
+                is QuickNavLayoutSpec.Vertical -> LazyVerticalStaggeredGrid(
+                    columns = cells,
+                    modifier = containerModifier.fillMaxWidth(),
+                    state = gridState,
+                    verticalItemSpacing = dimensions.itemSpacing,
+                    horizontalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
+                ) {
+                    gridScope.items.forEach { gridItem ->
+                        item(
+                            key = gridItem.key,
+                            span = gridItem.span,
+                            contentType = gridItem.contentType,
+                            content = { gridItem.content(this) }
+                        )
+                    }
+                }
+
+                is QuickNavLayoutSpec.Horizontal -> LazyHorizontalStaggeredGrid(
+                    rows = cells,
+                    modifier = containerModifier.fillMaxWidth(),
+                    state = gridState,
+                    verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing),
+                    horizontalItemSpacing = dimensions.itemSpacing
+                ) {
+                    gridScope.items.forEach { gridItem ->
+                        item(
+                            key = gridItem.key,
+                            span = gridItem.span,
+                            contentType = gridItem.contentType,
+                            content = { gridItem.content(this) }
+                        )
+                    }
+                }
+            }
+        },
+    )
 }

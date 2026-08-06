@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import br.com.arml.composecollections.scrollables.components.QuickNavButton
 import br.com.arml.composecollections.scrollables.defaults.QuickNavTheme
 
@@ -42,6 +41,7 @@ internal fun HorizontalPanelNavigation(
     val icons = QuickNavTheme.icons
     val transitions = QuickNavTheme.transitions
     val labels = QuickNavTheme.labels
+    val dimensions = QuickNavTheme.dimensions
 
     val backwardIcon = if (isHorizontal) icons.left else icons.up
     val forwardIcon = if (isHorizontal) icons.right else icons.down
@@ -49,7 +49,7 @@ internal fun HorizontalPanelNavigation(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(dimensions.buttonSpacing)
     ) {
         QuickNavigation(
             modifier = Modifier.testTag(labels.previousTag),
@@ -92,6 +92,7 @@ internal fun VerticalPanelNavigation(
     val icons = QuickNavTheme.icons
     val transitions = QuickNavTheme.transitions
     val labels = QuickNavTheme.labels
+    val dimensions = QuickNavTheme.dimensions
 
     val backwardIcon = if (isHorizontal) icons.left else icons.up
     val forwardIcon = if (isHorizontal) icons.right else icons.down
@@ -99,7 +100,7 @@ internal fun VerticalPanelNavigation(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(dimensions.buttonSpacing)
     ) {
         QuickNavigation(
             modifier = Modifier.testTag(labels.previousTag),

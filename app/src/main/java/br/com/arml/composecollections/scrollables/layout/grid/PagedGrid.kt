@@ -11,24 +11,26 @@
 package br.com.arml.composecollections.scrollables.layout.grid
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import br.com.arml.composecollections.R
 import br.com.arml.composecollections.scrollables.defaults.LocalQuickNavLabels
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
 import br.com.arml.composecollections.scrollables.defaults.QuickNavAnimationMode
+import br.com.arml.composecollections.scrollables.defaults.QuickNavDimensionDefaults
+import br.com.arml.composecollections.scrollables.defaults.QuickNavDimensions
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIconDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIcons
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutDefaults
@@ -36,8 +38,11 @@ import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutSpec
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabelDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
 import br.com.arml.composecollections.scrollables.defaults.QuickNavMode
+import br.com.arml.composecollections.scrollables.defaults.QuickNavTheme
 import br.com.arml.composecollections.scrollables.internal.QuickNavLinearIndicator
 import br.com.arml.composecollections.scrollables.layout.foundation.QuickNavScaffold
+import br.com.arml.composecollections.scrollables.layout.grid.scope.QuickNavGridScope
+import br.com.arml.composecollections.scrollables.layout.grid.scope.QuickNavGridScopeImpl
 import br.com.arml.composecollections.scrollables.state.QuickNavState
 import br.com.arml.composecollections.scrollables.state.rememberQuickNavGridState
 
@@ -47,15 +52,16 @@ import br.com.arml.composecollections.scrollables.state.rememberQuickNavGridStat
  * @param cells The cell configuration for the grid.
  * @param modifier The modifier to be applied to the root layout.
  * @param gridState The state object to be used to control the grid.
- * @param quickNavState The navigation state controller.
+ * @param quickNavState The navigation state controller. Defaults to a standard grid implementation.
  * @param layoutSpec Defines the orientation and item arrangement.
  * @param navigationAlignment Where to place the navigation controls.
  * @param animationMode The scroll animation preset.
  * @param isOverlay If true, navigation buttons float over the grid content.
  * @param showIndicator If true, displays a scroll progress indicator.
- * @param labels Labels and tags for navigation buttons.
- * @param icons Icon set for navigation buttons.
- * @param content The content of the grid.
+ * @param labels Labels and tags for navigation buttons. Defaults to themed or paged defaults.
+ * @param icons Icon set for navigation buttons. Defaults to standard theme icons.
+ * @param dimens Dimension tokens for spacing and sizing.
+ * @param content The content of the grid, defined using [br.com.arml.composecollections.scrollables.layout.grid.scope.QuickNavGridScope].
  */
 @Composable
 fun PagedGrid(
@@ -70,9 +76,11 @@ fun PagedGrid(
     showIndicator: Boolean = false,
     labels: QuickNavLabels = LocalQuickNavLabels.current ?: QuickNavLabelDefaults.pagedLabels(),
     icons: QuickNavIcons = QuickNavIconDefaults.default,
-    content: LazyGridScope.() -> Unit
+    dimens: QuickNavDimensions = QuickNavDimensionDefaults.default,
+    content: QuickNavGridScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val gridScope = remember(content) { QuickNavGridScopeImpl().apply(content) }
 
     // Stable actions
     val onScrollBackward = remember(quickNavState, scope) { { quickNavState.animateScrollToBackward(scope); Unit } }
@@ -82,12 +90,19 @@ fun PagedGrid(
 
     val isHorizontal = layoutSpec is QuickNavLayoutSpec.Horizontal
 
+    val currentHeaderIndex by remember {
+        derivedStateOf {
+            gridScope.headerIndexes.lastOrNull { it <= gridState.firstVisibleItemIndex }
+        }
+    }
+
     QuickNavScaffold(
-        modifier = modifier.testTag(stringResource(R.string.pagedQuickNavList_component_testTag)),
+        modifier = modifier.testTag(br.com.arml.composecollections.scrollables.internal.getString(R.string.pagedQuickNavList_component_testTag)),
         isOverlay = isOverlay,
         navigationAlignment = navigationAlignment,
         labels = labels,
         icons = icons,
+        dimens = dimens,
         isHorizontal = isHorizontal,
         showBackward = { quickNavState.showScrollToBackward },
         showForward = { quickNavState.showScrollToForward },
@@ -102,25 +117,50 @@ fun PagedGrid(
                     isHorizontal = isHorizontal
                 )
             }
+        },
+        topOverlay = {
+            currentHeaderIndex?.let { index ->
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    gridScope.items[index].content(null)
+                }
+            }
         }
     ) { containerModifier ->
+        val dimensions = QuickNavTheme.dimensions
         when (layoutSpec) {
             is QuickNavLayoutSpec.Vertical -> LazyVerticalGrid(
                 columns = cells,
                 modifier = containerModifier.fillMaxWidth(),
                 state = gridState,
                 verticalArrangement = layoutSpec.arrangement,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                content = content
-            )
+                horizontalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
+            ) {
+                gridScope.items.forEach { gridItem ->
+                    item(
+                        key = gridItem.key,
+                        span = gridItem.span,
+                        contentType = gridItem.contentType,
+                        content = { gridItem.content(this) }
+                    )
+                }
+            }
+
             is QuickNavLayoutSpec.Horizontal -> LazyHorizontalGrid(
                 rows = cells,
                 modifier = containerModifier.fillMaxWidth(),
                 state = gridState,
                 horizontalArrangement = layoutSpec.arrangement,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                content = content
-            )
+                verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
+            ) {
+                gridScope.items.forEach { gridItem ->
+                    item(
+                        key = gridItem.key,
+                        span = gridItem.span,
+                        contentType = gridItem.contentType,
+                        content = { gridItem.content(this) }
+                    )
+                }
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ Add the dependency to your `build.gradle.kts` (module app):
 
 ```kotlin
 dependencies {
-    implementation("br.com.arml.composecollections:composecollections:0.2.4")
+    implementation("br.com.arml.composecollections:composecollections:0.2.5")
 }
 ```
 

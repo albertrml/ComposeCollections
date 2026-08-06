@@ -26,12 +26,14 @@ import br.com.arml.composecollections.R
 import br.com.arml.composecollections.scrollables.defaults.LocalQuickNavLabels
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
 import br.com.arml.composecollections.scrollables.defaults.QuickNavAnimationMode
+import br.com.arml.composecollections.scrollables.defaults.QuickNavDimensionDefaults
+import br.com.arml.composecollections.scrollables.defaults.QuickNavDimensions
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIconDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIcons
-import br.com.arml.composecollections.scrollables.defaults.QuickNavLabelDefaults
-import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLayoutSpec
+import br.com.arml.composecollections.scrollables.defaults.QuickNavLabelDefaults
+import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
 import br.com.arml.composecollections.scrollables.defaults.QuickNavMode
 import br.com.arml.composecollections.scrollables.internal.QuickNavLinearIndicator
 import br.com.arml.composecollections.scrollables.layout.foundation.QuickNavScaffold
@@ -51,6 +53,7 @@ import br.com.arml.composecollections.scrollables.state.rememberQuickNavListStat
  * @param showIndicator If true, displays a scroll progress indicator.
  * @param labels Labels and tags for navigation buttons.
  * @param icons Icon set for navigation buttons.
+ * @param dimens Dimension tokens for spacing and sizing.
  * @param content The content of the list.
  */
 @Composable
@@ -65,7 +68,8 @@ fun PagedList(
     showIndicator: Boolean = false,
     labels: QuickNavLabels = LocalQuickNavLabels.current ?: QuickNavLabelDefaults.pagedLabels(),
     icons: QuickNavIcons = QuickNavIconDefaults.default,
-    content: LazyListScope.() -> Unit
+    dimens: QuickNavDimensions = QuickNavDimensionDefaults.default,
+    content: LazyListScope.() -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -83,6 +87,7 @@ fun PagedList(
         navigationAlignment = navigationAlignment,
         labels = labels,
         icons = icons,
+        dimens = dimens,
         isHorizontal = isHorizontal,
         showBackward = { quickNavState.showScrollToBackward },
         showForward = { quickNavState.showScrollToForward },
@@ -97,7 +102,7 @@ fun PagedList(
                     isHorizontal = isHorizontal
                 )
             }
-        }
+        },
     ) { containerModifier ->
         when (layoutSpec) {
             is QuickNavLayoutSpec.Vertical -> LazyColumn(
@@ -107,6 +112,7 @@ fun PagedList(
                 horizontalAlignment = layoutSpec.alignment,
                 content = content
             )
+
             is QuickNavLayoutSpec.Horizontal -> LazyRow(
                 modifier = containerModifier.fillMaxWidth(),
                 state = listState,

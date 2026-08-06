@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2026-08-05
+
+### Added
+- **Grid Sticky Headers**: Introduced a custom `QuickNavGridScope` that brings `stickyHeader` support to `PagedGrid`, `EdgedGrid`, and their staggered variants.
+- **Floating Overlay Logic**: Implemented a virtual sticky header system using a floating overlay that synchronizes with the grid's scroll state.
+- **New Scaffold Slot**: Added `topOverlay` to `QuickNavScaffold` to host fixed UI elements like the new grid headers.
+- **Comprehensive Grid Support**: Sticky headers are now fully functional in `LazyVerticalGrid`, `LazyHorizontalGrid`, and Pinterest-style `StaggeredGrids`.
+
+### Fixed
+- **Header Sync**: Added a dedicated test tag `QuickNavScaffoldHeaderOverlayTestTag` to ensure reliable instrumentation of floating headers.
+- **Scroll Observation**: Refined the header switcher logic to correctly detect and swap headers during high-velocity scrolls.
+
 ## [0.2.4] - 2026-08-05
 
 ### Added
