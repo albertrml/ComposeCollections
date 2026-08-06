@@ -73,7 +73,7 @@ fun QuickNavLayout(
             contentTop(Modifier)
             Row(
                 modifier = Modifier
-                    .weight(1f, fill = false)
+                    .weight(1f)
                     .wrapContentHeight(),
                 horizontalArrangement = Arrangement.spacedBy(panelSpacing),
                 verticalAlignment = Alignment.CenterVertically
@@ -81,7 +81,7 @@ fun QuickNavLayout(
                 contentLeft(Modifier)
                 Box(
                     modifier = Modifier
-                        .weight(1f, fill = false)
+                        .weight(1f)
                         .wrapContentWidth()
                 ) {
                     content(PaddingValues(0.dp))

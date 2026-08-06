@@ -11,6 +11,7 @@
 package br.com.arml.composecollections.scrollables.defaults
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import br.com.arml.composecollections.R
 
@@ -27,6 +28,7 @@ import br.com.arml.composecollections.R
  * @property nextContentDescription The accessibility text for the next button.
  * @property nextTag The test tag used to identify the next button in UI tests.
  */
+@Immutable
 data class QuickNavLabels(
     val previousLabel: String,
     val previousContentDescription: String,

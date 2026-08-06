@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.6] - 2026-08-06
+
+### Added
+- **API Consolidation**: `QuickNavScaffold` now accepts a single `quickNavState: QuickNavState` parameter instead of multiple lambdas, leading to a cleaner and more robust internal architecture.
+- **Performance Excellence**: Enabled **Compose Compiler Metrics** to monitor library health. Confirmed that all main components are now 100% `skippable`.
+- **Stability Tokens**: Applied `@Immutable` and `@Stable` annotations across all design tokens (`Labels`, `Icons`, `Dimensions`) to prevent unnecessary recompositions.
+- **IDE Productivity**: Introduced `QuickNavStateProvider`, allowing developers to preview various scroll states (Start, Middle, End) directly in the Android Studio Design panel.
+- **Semantic Headers**: Utilized the `isHeader` property in Grids to automatically apply `heading()` semantics, improving accessibility for TalkBack users.
+- **Educational Guides**: Added new documentation files: `COMPOSE_COMPILER_METRICS_GUIDE.md`, `API_DESIGN_GUIDELINES.md`, and `COMPOSE_GUIDELINES.md`.
+
+### Changed
+- **Internal Refactoring**: Extracted repetitive grid rendering logic into `renderQuickNavItems` utility functions to improve maintainability and readability.
+- **Simplified Signatures**: Internal components like `NavigationRouter` now consume theme data directly from `QuickNavTheme`, eliminating redundant parameter passing.
+- **Layout Expansion**: Updated `QuickNavLayout` to default to `fill = true`, ensuring components occupy the available space effectively.
+
+### Fixed
+- **Horizontal Staggered Spacing**: Resolved a visual issue where `LazyHorizontalStaggeredGrid` would show excessive empty space between lanes by improving space distribution in the Scaffold and updating samples to use adaptive cell sizing.
+
 ## [0.2.5] - 2026-08-05
 
 ### Added

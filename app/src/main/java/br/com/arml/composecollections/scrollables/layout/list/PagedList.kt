@@ -17,8 +17,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -71,14 +69,6 @@ fun PagedList(
     dimens: QuickNavDimensions = QuickNavDimensionDefaults.default,
     content: LazyListScope.() -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-
-    // Stable actions
-    val onScrollBackward = remember(quickNavState, scope) { { quickNavState.animateScrollToBackward(scope); Unit } }
-    val onScrollForward = remember(quickNavState, scope) { { quickNavState.animateScrollToForward(scope); Unit } }
-    val onScrollToStart = remember(quickNavState, scope) { { quickNavState.animateScrollToStart(scope); Unit } }
-    val onScrollToEnd = remember(quickNavState, scope) { { quickNavState.animateScrollToEnd(scope); Unit } }
-
     val isHorizontal = layoutSpec is QuickNavLayoutSpec.Horizontal
 
     QuickNavScaffold(
@@ -88,13 +78,8 @@ fun PagedList(
         labels = labels,
         icons = icons,
         dimens = dimens,
+        quickNavState = quickNavState,
         isHorizontal = isHorizontal,
-        showBackward = { quickNavState.showScrollToBackward },
-        showForward = { quickNavState.showScrollToForward },
-        onScrollBackward = onScrollBackward,
-        onScrollForward = onScrollForward,
-        onScrollToStart = onScrollToStart,
-        onScrollToEnd = onScrollToEnd,
         indicator = {
             if (showIndicator) {
                 QuickNavLinearIndicator(

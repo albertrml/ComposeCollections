@@ -105,7 +105,7 @@ This table shows which features are available across the public components.
 
 - **QuickNavTheme -> UI**: Provides colors, icons, and labels via `CompositionLocal`.
 - **QuickNavState -> Scaffold**: 
-    - The Scaffold reads `showScrollToForward/Backward` to toggle visibility.
+    - The Scaffold consumes the entire `QuickNavState` object to manage visibility and navigation.
     - On user clicks or **hardware key events** (`PageUp/Down`, `Home/End`), the Scaffold triggers the corresponding `animateScrollTo...` methods.
 - **LayoutSpec -> LazyContainer**: Controls whether the content is a `LazyColumn`, `LazyRow`, or a `Grid` variant.
 

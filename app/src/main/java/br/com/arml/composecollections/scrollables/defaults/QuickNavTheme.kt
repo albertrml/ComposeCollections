@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
  * @property left Icon for scrolling left (Horizontal).
  * @property right Icon for scrolling right (Horizontal).
  */
+@Immutable
 data class QuickNavIcons(
     val up: ImageVector,
     val down: ImageVector,
@@ -53,6 +55,7 @@ object QuickNavIconDefaults {
  * @property enter The transition used when a button becomes visible.
  * @property exit The transition used when a button is hidden.
  */
+@Immutable
 data class QuickNavTransitions(
     val enter: EnterTransition,
     val exit: ExitTransition

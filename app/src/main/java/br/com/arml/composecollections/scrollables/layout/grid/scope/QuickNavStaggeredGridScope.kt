@@ -10,9 +10,14 @@
 
 package br.com.arml.composecollections.scrollables.layout.grid.scope
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 
 /**
  * Receiver scope which is used by [br.com.arml.composecollections.scrollables.layout.grid.PagedStaggeredGrid] and [br.com.arml.composecollections.scrollables.layout.grid.EdgedStaggeredGrid] to provide sticky header support.
@@ -74,6 +79,24 @@ fun <T> QuickNavStaggeredGridScope.items(
         contentType = { index -> contentType(items[index]) },
         itemContent = { index -> itemContent(items[index]) }
     )
+}
+
+/**
+ * Internal helper to render items from a [QuickNavStaggeredGridScopeImpl] into a [LazyStaggeredGridScope].
+ */
+internal fun LazyStaggeredGridScope.renderQuickNavItems(items: List<QuickNavStaggeredGridItem>) {
+    items.forEach { gridItem ->
+        item(
+            key = gridItem.key,
+            span = gridItem.span,
+            contentType = gridItem.contentType,
+            content = {
+                Box(modifier = if (gridItem.isHeader) Modifier.semantics { heading() } else Modifier) {
+                    gridItem.content(this@item)
+                }
+            }
+        )
+    }
 }
 
 internal class QuickNavStaggeredGridScopeImpl : QuickNavStaggeredGridScope {

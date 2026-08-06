@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -44,6 +43,7 @@ import br.com.arml.composecollections.scrollables.internal.QuickNavLinearIndicat
 import br.com.arml.composecollections.scrollables.layout.foundation.QuickNavScaffold
 import br.com.arml.composecollections.scrollables.layout.grid.scope.QuickNavStaggeredGridScope
 import br.com.arml.composecollections.scrollables.layout.grid.scope.QuickNavStaggeredGridScopeImpl
+import br.com.arml.composecollections.scrollables.layout.grid.scope.renderQuickNavItems
 import br.com.arml.composecollections.scrollables.state.QuickNavState
 import br.com.arml.composecollections.scrollables.state.rememberQuickNavStaggeredGridState
 
@@ -51,13 +51,13 @@ import br.com.arml.composecollections.scrollables.state.rememberQuickNavStaggere
  * A highly customizable staggered grid that provides navigation controls to jump directly to the
  * start or end of the collection.
  *
- * @param cells The cell configuration for the staggered grid.
  * @param modifier The modifier to be applied to the root layout.
  * @param gridState The state object to be used to control the grid.
  * @param quickNavState The navigation state controller. Defaults to a standard staggered implementation.
  * @param layoutSpec Defines the orientation and item arrangement.
  * @param navigationAlignment Where to place the navigation controls.
  * @param animationMode The scroll animation preset.
+ * @param cells The cell configuration for the staggered grid.
  * @param isOverlay If true, navigation buttons float over the grid content.
  * @param showIndicator If true, displays a scroll progress indicator.
  * @param labels Labels and tags for navigation buttons. Defaults to themed or edged defaults.
@@ -67,13 +67,13 @@ import br.com.arml.composecollections.scrollables.state.rememberQuickNavStaggere
  */
 @Composable
 fun EdgedStaggeredGrid(
-    cells: StaggeredGridCells,
     modifier: Modifier = Modifier,
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     quickNavState: QuickNavState = rememberQuickNavStaggeredGridState(gridState, QuickNavMode.Edged),
     layoutSpec: QuickNavLayoutSpec = QuickNavLayoutDefaults.Vertical,
     navigationAlignment: NavigationAlignment = NavigationAlignment.Bottom,
     animationMode: QuickNavAnimationMode = QuickNavAnimationMode.Default,
+    cells: StaggeredGridCells,
     isOverlay: Boolean = false,
     showIndicator: Boolean = false,
     labels: QuickNavLabels = LocalQuickNavLabels.current ?: QuickNavLabelDefaults.edgedLabels(),
@@ -81,15 +81,7 @@ fun EdgedStaggeredGrid(
     dimens: QuickNavDimensions = QuickNavDimensionDefaults.default,
     content: QuickNavStaggeredGridScope.() -> Unit
 ) {
-    val scope = rememberCoroutineScope()
     val gridScope = remember(content) { QuickNavStaggeredGridScopeImpl().apply(content) }
-
-    // Stable actions
-    val onScrollBackward = remember(quickNavState, scope) { { quickNavState.animateScrollToBackward(scope); Unit } }
-    val onScrollForward = remember(quickNavState, scope) { { quickNavState.animateScrollToForward(scope); Unit } }
-    val onScrollToStart = remember(quickNavState, scope) { { quickNavState.animateScrollToStart(scope); Unit } }
-    val onScrollToEnd = remember(quickNavState, scope) { { quickNavState.animateScrollToEnd(scope); Unit } }
-
     val isHorizontal = layoutSpec is QuickNavLayoutSpec.Horizontal
 
     val currentHeaderIndex by remember {
@@ -105,13 +97,8 @@ fun EdgedStaggeredGrid(
         labels = labels,
         icons = icons,
         dimens = dimens,
+        quickNavState = quickNavState,
         isHorizontal = isHorizontal,
-        showBackward = { quickNavState.showScrollToBackward },
-        showForward = { quickNavState.showScrollToForward },
-        onScrollBackward = onScrollBackward,
-        onScrollForward = onScrollForward,
-        onScrollToStart = onScrollToStart,
-        onScrollToEnd = onScrollToEnd,
         indicator = {
             if (showIndicator) {
                 QuickNavLinearIndicator(
@@ -137,14 +124,7 @@ fun EdgedStaggeredGrid(
                     verticalItemSpacing = dimensions.itemSpacing,
                     horizontalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
                 ) {
-                    gridScope.items.forEach { gridItem ->
-                        item(
-                            key = gridItem.key,
-                            span = gridItem.span,
-                            contentType = gridItem.contentType,
-                            content = { gridItem.content(this) }
-                        )
-                    }
+                    renderQuickNavItems(gridScope.items)
                 }
 
                 is QuickNavLayoutSpec.Horizontal -> LazyHorizontalStaggeredGrid(
@@ -154,14 +134,7 @@ fun EdgedStaggeredGrid(
                     verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing),
                     horizontalItemSpacing = dimensions.itemSpacing
                 ) {
-                    gridScope.items.forEach { gridItem ->
-                        item(
-                            key = gridItem.key,
-                            span = gridItem.span,
-                            contentType = gridItem.contentType,
-                            content = { gridItem.content(this) }
-                        )
-                    }
+                    renderQuickNavItems(gridScope.items)
                 }
             }
         },

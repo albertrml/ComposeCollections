@@ -11,11 +11,13 @@
 package br.com.arml.composecollections.scrollables.defaults
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 
 /**
  * Defines the placement of navigation controls relative to the scrollable content.
  */
+@Stable
 sealed class NavigationAlignment {
     /** Place both navigation controls at the top (or start). */
     object Top : NavigationAlignment()
@@ -34,6 +36,7 @@ sealed class NavigationAlignment {
 /**
  * Represents the scroll orientation of a QuickNav component.
  */
+@Stable
 sealed class QuickNavOrientation {
     object Horizontal : QuickNavOrientation()
     object Vertical : QuickNavOrientation()
@@ -54,6 +57,7 @@ enum class QuickNavMode {
  *
  * Use this class to define how items are arranged and aligned within the scrollable container.
  */
+@Stable
 sealed class QuickNavLayoutSpec {
     /**
      * Vertical layout settings typically used for LazyColumn.

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -32,6 +33,8 @@ import br.com.arml.composecollections.scrollables.defaults.QuickNavIcons
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
 import br.com.arml.composecollections.scrollables.defaults.QuickNavTheme
 import br.com.arml.composecollections.scrollables.internal.NavigationRouter
+import br.com.arml.composecollections.scrollables.state.QuickNavState
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * High-level template that unifies theme, scaffold layout, and navigation routing.
@@ -46,13 +49,8 @@ import br.com.arml.composecollections.scrollables.internal.NavigationRouter
  * @param labels Labels and tags for navigation buttons.
  * @param icons Icon set for navigation buttons.
  * @param dimens Dimension tokens for spacing and sizing.
+ * @param quickNavState The state controller for navigation actions and visibility.
  * @param isHorizontal The scroll orientation of the inner content.
- * @param showBackward Lambda returning true if the backward/up button should be shown.
- * @param showForward Lambda returning true if the forward/down button should be shown.
- * @param onScrollBackward Callback for the backward navigation action.
- * @param onScrollForward Callback for the forward navigation action.
- * @param onScrollToStart Optional callback for jumping to the absolute start (Home key).
- * @param onScrollToEnd Optional callback for jumping to the absolute end (End key).
  * @param indicator Optional slot for displaying scroll progress.
  * @param topOverlay Optional slot for floating content at the top (e.g., sticky headers for Grid).
  * @param container The main scrollable UI component (e.g., LazyColumn, LazyRow).
@@ -65,17 +63,14 @@ fun QuickNavScaffold(
     labels: QuickNavLabels,
     icons: QuickNavIcons,
     dimens: QuickNavDimensions,
+    quickNavState: QuickNavState,
     isHorizontal: Boolean,
-    showBackward: () -> Boolean = { false },
-    showForward: () -> Boolean = { false },
-    onScrollBackward: () -> Unit = {},
-    onScrollForward: () -> Unit = {},
-    onScrollToStart: () -> Unit = {},
-    onScrollToEnd: () -> Unit = {},
     indicator: @Composable () -> Unit = {},
     topOverlay: @Composable () -> Unit = {},
     container: @Composable (Modifier) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    
     QuickNavTheme(labels = labels, icons = icons, dimensions = dimens) {
         val dimensions = QuickNavTheme.dimensions
         val keyboardModifier = Modifier
@@ -83,10 +78,10 @@ fun QuickNavScaffold(
                 if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
                 
                 when (event.key) {
-                    Key.PageUp -> { onScrollBackward(); true }
-                    Key.PageDown -> { onScrollForward(); true }
-                    Key.MoveHome -> { onScrollToStart(); true }
-                    Key.MoveEnd -> { onScrollToEnd(); true }
+                    Key.PageUp -> { quickNavState.animateScrollToBackward(scope); true }
+                    Key.PageDown -> { quickNavState.animateScrollToForward(scope); true }
+                    Key.MoveHome -> { quickNavState.animateScrollToStart(scope); true }
+                    Key.MoveEnd -> { quickNavState.animateScrollToEnd(scope); true }
                     else -> false
                 }
             }
@@ -99,16 +94,14 @@ fun QuickNavScaffold(
                 verticalArrangement = Arrangement.spacedBy(dimensions.panelToContentSpacing)
             ) {
                 indicator()
-                Box {
+                Box(Modifier.weight(1f)) {
                     QuickNavNavigationFrame(
-                        modifier = Modifier,
+                        modifier = Modifier.fillMaxWidth(),
                         isOverlay = isOverlay,
                         navigationAlignment = navigationAlignment,
+                        quickNavState = quickNavState,
+                        scope = scope,
                         isHorizontal = true,
-                        showBackward = showBackward,
-                        showForward = showForward,
-                        onScrollBackward = onScrollBackward,
-                        onScrollForward = onScrollForward,
                         container = container
                     )
                     Box(Modifier.testTag(stringResource(R.string.quickNav_scaffold_header_overlay_testTag))) {
@@ -127,11 +120,9 @@ fun QuickNavScaffold(
                         modifier = Modifier.fillMaxWidth(),
                         isOverlay = isOverlay,
                         navigationAlignment = navigationAlignment,
+                        quickNavState = quickNavState,
+                        scope = scope,
                         isHorizontal = false,
-                        showBackward = { showBackward() },
-                        showForward = { showForward() },
-                        onScrollBackward = onScrollBackward,
-                        onScrollForward = onScrollForward,
                         container = container
                     )
                     Box(Modifier.testTag(stringResource(R.string.quickNav_scaffold_header_overlay_testTag))) {
@@ -152,11 +143,9 @@ internal fun QuickNavNavigationFrame(
     modifier: Modifier = Modifier,
     isOverlay: Boolean = false,
     navigationAlignment: NavigationAlignment = NavigationAlignment.Bottom,
+    quickNavState: QuickNavState,
+    scope: CoroutineScope,
     isHorizontal: Boolean,
-    showBackward: () -> Boolean,
-    showForward: () -> Boolean,
-    onScrollBackward: () -> Unit,
-    onScrollForward: () -> Unit,
     container: @Composable (Modifier) -> Unit
 ) {
     QuickNavLayout(
@@ -167,12 +156,10 @@ internal fun QuickNavNavigationFrame(
                 alignment = navigationAlignment,
                 target = NavigationAlignment.Top,
                 secondaryTarget = NavigationAlignment.Vertical,
+                quickNavState = quickNavState,
+                scope = scope,
                 isHorizontal = isHorizontal,
-                isStart = true,
-                showBackward = showBackward,
-                showForward = showForward,
-                onScrollBackward = onScrollBackward,
-                onScrollForward = onScrollForward
+                isStart = true
             )
         },
         contentBottom = {
@@ -180,12 +167,10 @@ internal fun QuickNavNavigationFrame(
                 alignment = navigationAlignment,
                 target = NavigationAlignment.Bottom,
                 secondaryTarget = NavigationAlignment.Vertical,
+                quickNavState = quickNavState,
+                scope = scope,
                 isHorizontal = isHorizontal,
-                isStart = false,
-                showBackward = showBackward,
-                showForward = showForward,
-                onScrollBackward = onScrollBackward,
-                onScrollForward = onScrollForward
+                isStart = false
             )
         },
         contentLeft = {
@@ -193,12 +178,10 @@ internal fun QuickNavNavigationFrame(
                 alignment = navigationAlignment,
                 target = NavigationAlignment.Start,
                 secondaryTarget = NavigationAlignment.Horizontal,
+                quickNavState = quickNavState,
+                scope = scope,
                 isHorizontal = isHorizontal,
-                isStart = true,
-                showBackward = showBackward,
-                showForward = showForward,
-                onScrollBackward = onScrollBackward,
-                onScrollForward = onScrollForward
+                isStart = true
             )
         },
         contentRight = {
@@ -206,12 +189,10 @@ internal fun QuickNavNavigationFrame(
                 alignment = navigationAlignment,
                 target = NavigationAlignment.End,
                 secondaryTarget = NavigationAlignment.Horizontal,
+                quickNavState = quickNavState,
+                scope = scope,
                 isHorizontal = isHorizontal,
-                isStart = false,
-                showBackward = showBackward,
-                showForward = showForward,
-                onScrollBackward = onScrollBackward,
-                onScrollForward = onScrollForward
+                isStart = false
             )
         }
     ) {

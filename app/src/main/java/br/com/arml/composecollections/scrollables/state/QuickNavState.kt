@@ -10,6 +10,7 @@
 
 package br.com.arml.composecollections.scrollables.state
 
+import androidx.compose.runtime.Stable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 
@@ -20,6 +21,7 @@ import kotlinx.coroutines.Job
  * visibility triggers or specialized scroll animations, while remaining compatible
  * with the library's UI components.
  */
+@Stable
 interface QuickNavState {
     /**
      * Whether the "Backward" (Up/Start/Previous) navigation button should be displayed.

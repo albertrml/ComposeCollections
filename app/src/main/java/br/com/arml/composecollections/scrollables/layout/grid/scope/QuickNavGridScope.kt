@@ -10,10 +10,15 @@
 
 package br.com.arml.composecollections.scrollables.layout.grid.scope
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 
 /**
  * Receiver scope which is used by [br.com.arml.composecollections.scrollables.layout.grid.PagedGrid] and [br.com.arml.composecollections.scrollables.layout.grid.EdgedGrid] to provide sticky header support.
@@ -21,7 +26,6 @@ import androidx.compose.runtime.Composable
 interface QuickNavGridScope {
     /**
      * Adds a sticky header to the grid.
-     * Note: content is a standard Composable because it might be rendered in an overlay.
      */
     fun stickyHeader(
         key: Any? = null,
@@ -76,6 +80,24 @@ fun <T> QuickNavGridScope.items(
         contentType = { index -> contentType(items[index]) },
         itemContent = { index -> itemContent(items[index]) }
     )
+}
+
+/**
+ * Internal helper to render items from a [QuickNavGridScopeImpl] into a [LazyGridScope].
+ */
+internal fun LazyGridScope.renderQuickNavItems(items: List<QuickNavGridItem>) {
+    items.forEach { gridItem ->
+        item(
+            key = gridItem.key,
+            span = gridItem.span,
+            contentType = gridItem.contentType,
+            content = {
+                Box(modifier = if (gridItem.isHeader) Modifier.semantics { heading() } else Modifier) {
+                    gridItem.content(this@item)
+                }
+            }
+        )
+    }
 }
 
 internal class QuickNavGridScopeImpl : QuickNavGridScope {

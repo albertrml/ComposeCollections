@@ -13,6 +13,8 @@ package br.com.arml.composecollections.scrollables.internal
 import androidx.compose.runtime.Composable
 import br.com.arml.composecollections.scrollables.defaults.NavigationAlignment
 import br.com.arml.composecollections.scrollables.defaults.QuickNavTheme
+import br.com.arml.composecollections.scrollables.state.QuickNavState
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Internal component that routes the appropriate navigation panel based on alignment.
@@ -24,15 +26,18 @@ internal fun NavigationRouter(
     alignment: NavigationAlignment,
     target: NavigationAlignment,
     secondaryTarget: NavigationAlignment,
+    quickNavState: QuickNavState,
+    scope: CoroutineScope,
     isHorizontal: Boolean,
-    isStart: Boolean,
-    showBackward: () -> Boolean,
-    showForward: () -> Boolean,
-    onScrollBackward: () -> Unit,
-    onScrollForward: () -> Unit
+    isStart: Boolean
 ) {
     val labels = QuickNavTheme.labels
     val icons = QuickNavTheme.icons
+
+    val showBackward = { quickNavState.showScrollToBackward }
+    val showForward = { quickNavState.showScrollToForward }
+    val onScrollBackward = { quickNavState.animateScrollToBackward(scope); Unit }
+    val onScrollForward = { quickNavState.animateScrollToForward(scope); Unit }
 
     when (alignment) {
         target -> {

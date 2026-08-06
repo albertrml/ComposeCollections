@@ -1,10 +1,12 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     `maven-publish`
 }
 
-val libraryVersion = "0.2.5"
+val libraryVersion = "0.2.6"
 
 android {
     namespace = "br.com.arml.composecollections"
@@ -14,7 +16,7 @@ android {
         applicationId = "br.com.arml.composecollections"
         minSdk = 24
         targetSdk = 37
-        versionCode = 8
+        versionCode = 9
         versionName = libraryVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -39,6 +41,19 @@ android {
         singleVariant("release") {
             publishApk()
         }
+    }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+                    project.layout.buildDirectory.dir("compose_metrics").get().asFile.absolutePath,
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+                    project.layout.buildDirectory.dir("compose_metrics").get().asFile.absolutePath
+        )
     }
 }
 

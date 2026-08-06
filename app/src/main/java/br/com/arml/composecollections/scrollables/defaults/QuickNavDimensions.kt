@@ -10,6 +10,7 @@
 
 package br.com.arml.composecollections.scrollables.defaults
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
  * @property buttonSpacing Spacing between navigation buttons within the same panel.
  * @property indicatorThickness Height (horizontal) or width (vertical) of the progress indicator.
  */
+@Immutable
 data class QuickNavDimensions(
     val panelToContentSpacing: Dp,
     val itemSpacing: Dp,

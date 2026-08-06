@@ -15,6 +15,7 @@ O **ComposeCollections** foca em melhorar a experiência de navegação em lista
 *   **PagedList & PagedGrid**: Navegação por **páginas**, rolando exatamente a quantidade de itens visíveis na tela (viewport).
 *   **Sticky Headers for Grids**: Suporte exclusivo para cabeçalhos fixos em grades (`PagedGrid`, `EdgedGrid`, etc.), superando limitações nativas do Compose.
 *   **Acessibilidade & Hardware**: Suporte nativo para teclados e D-pads (TV). Use `PageUp/Down` para páginas e `Home/End` para extremos.
+*   **Performance Industrial**: 100% otimizado para evitar recomposições desnecessárias, validado por métricas do compilador.
 *   **Scroll Presets**: Escolha entre diferentes sensações de animação: `Snap` (parada seca) ou `Elastic` (rebote fluido).
 *   **Progress Indicators**: Nova barra de progresso visual que mostra o progresso do scroll em tempo real. Ative com `showIndicator = true`.
 *   **Suporte a Staggered Grids**: Agora suportamos grades irregulares estilo Pinterest via `PagedStaggeredGrid` e `EdgedStaggeredGrid`.
@@ -47,7 +48,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    implementation("br.com.arml.composecollections:composecollections:0.2.5")
+    implementation("br.com.arml.composecollections:composecollections:0.2.6")
 }
 ```
 

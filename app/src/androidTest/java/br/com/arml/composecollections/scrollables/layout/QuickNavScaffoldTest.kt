@@ -25,6 +25,7 @@ import br.com.arml.composecollections.scrollables.defaults.QuickNavDimensionDefa
 import br.com.arml.composecollections.scrollables.defaults.QuickNavIconDefaults
 import br.com.arml.composecollections.scrollables.defaults.QuickNavLabels
 import br.com.arml.composecollections.scrollables.layout.foundation.QuickNavScaffold
+import br.com.arml.composecollections.scrollables.samples.scrollables.MockQuickNavState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,6 +47,11 @@ class QuickNavScaffoldTest {
     @Test
     fun quickNavScaffold_shouldPropagateThemeAndTriggerActions() {
         var clicked = false
+        val mockState = MockQuickNavState(
+            showScrollToBackward = true,
+            showScrollToForward = false,
+            onAction = { clicked = true }
+        )
         
         composeTestRule.setContent {
             QuickNavScaffold(
@@ -53,9 +59,8 @@ class QuickNavScaffoldTest {
                 labels = testLabels,
                 icons = QuickNavIconDefaults.default,
                 dimens = QuickNavDimensionDefaults.default,
+                quickNavState = mockState,
                 isHorizontal = false,
-                showBackward = { true },
-                onScrollBackward = { clicked = true },
                 container = {
                     Box(Modifier.fillMaxSize()) { Text("Content") }
                 },

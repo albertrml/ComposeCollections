@@ -66,9 +66,9 @@ fun VerticalStaggeredPinterestSample() {
 @Composable
 fun HorizontalStaggeredGridSample() {
     MaterialTheme {
-        Surface(Modifier.fillMaxSize()) {
+        Surface(Modifier.fillMaxWidth()) {
             PagedStaggeredGrid(
-                cells = StaggeredGridCells.Fixed(2),
+                cells = StaggeredGridCells.Adaptive(150.dp),
                 layoutSpec = QuickNavLayoutSpec.Horizontal(),
                 navigationAlignment = NavigationAlignment.Bottom
             ) {
