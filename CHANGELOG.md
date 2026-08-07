@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.9] - 2026-08-07
+
+### Added
+- **Multi-Module Architecture**: Successfully separated the production library from the sample application.
+- **Dedicated :collections Module**: The core framework now lives in its own Android Library module, ensuring a clean and lightweight distribution.
+- **Resource Encapsulation**: Moved all library-specific resources (strings, test tags) to the `:collections` module for self-contained functionality.
+- **Sample Reorganization**: Moved all demonstration code to the `:app` module, transforming it into a real-world consumer of the library.
+
+### Changed
+- **Documentation Migration**: Technical guides and API maps moved to `collections/docs/` to keep knowledge close to implementation.
+- **Artifact Rebranding**: The primary artifact name for the core library is now **`collections`**.
+
+### Fixed
+- **Clean Distribution**: The published library no longer contains application-level code like `MainActivity` or sample assets.
+- **Test Integrity**: Validated the complete suite of 20 instrumentation tests in the new isolated library environment.
+
 ## [0.2.8] - 2026-08-07
 
 ### Added

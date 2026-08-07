@@ -1,37 +1,42 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+/*
+ * Copyright 2026 Albert Richard Moraes Lopes
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
     `maven-publish`
 }
 
-val libraryVersion = "0.2.8"
+val libraryVersion = "0.2.9"
 
 android {
-    namespace = "br.com.arml.composecollections"
+    namespace = "br.com.arml.composecollections.collections"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "br.com.arml.composecollections"
         minSdk = 24
-        targetSdk = 37
-        versionCode = 11
-        versionName = libraryVersion
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
         release {
-            optimization {
-                enable = false
-            }
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+    
     buildFeatures {
         compose = true
     }
+    
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -39,50 +44,25 @@ android {
 
     publishing {
         singleVariant("release") {
-            publishApk()
+            withSourcesJar()
         }
-    }
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
-                    project.layout.buildDirectory.dir("compose_metrics").get().asFile.absolutePath,
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
-                    project.layout.buildDirectory.dir("compose_metrics").get().asFile.absolutePath
-        )
     }
 }
 
 dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
-
-    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.activity.compose)
-
     implementation(composeBom)
-
-    implementation(libs.material)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.ui.tooling.preview)
-
-    implementation(project(":collections"))
-
+    
     testImplementation(libs.junit)
-
     androidTestImplementation(composeBom)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.ui.test.junit)
-
-    debugImplementation(composeBom)
     debugImplementation(libs.androidx.ui.test.manifest)
-    debugImplementation(libs.androidx.ui.tooling)
 }
 
 group = "br.com.arml.composecollections"
@@ -96,12 +76,12 @@ publishing {
             }
 
             groupId = "br.com.arml.composecollections"
-            artifactId = "composecollections"
+            artifactId = "collections"
             version = libraryVersion
 
             pom {
-                name.set("ComposeCollections")
-                description.set("Componentes Compose para exibição de grandes coleções de dados com navegação rápida.")
+                name.set("ComposeCollections Core")
+                description.set("Core components for high-performance Jetpack Compose collections.")
                 url.set("https://github.com/albertrml/ComposeCollections")
                 licenses {
                     license {
@@ -114,11 +94,6 @@ publishing {
                         id.set("albertrml")
                         name.set("Albert Richard")
                     }
-                }
-                scm {
-                    connection.set("scm:git:github.com/albertrml/ComposeCollections.git")
-                    developerConnection.set("scm:git:ssh://github.com/albertrml/ComposeCollections.git")
-                    url.set("https://github.com/albertrml/ComposeCollections/tree/main")
                 }
             }
         }

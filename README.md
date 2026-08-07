@@ -44,7 +44,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    implementation("br.com.arml.composecollections:composecollections:0.2.8")
+    implementation("br.com.arml.composecollections:collections:0.2.9")
 }
 ```
 
@@ -85,11 +85,12 @@ CollectionTheme(
 
 ## 📚 Documentação Detalhada
 
-Confira nossos guias:
-- [Mapa da API e Arquitetura](app/src/main/java/br/com/arml/composecollections/docs/API_MAP.md)
-- [Guia de Migração (v0.2.6 para v0.2.7)](app/src/main/java/br/com/arml/composecollections/docs/MIGRATION_GUIDE.md)
-- [Métricas de Performance](app/src/main/java/br/com/arml/composecollections/docs/COMPOSE_COMPILER_METRICS_GUIDE.md)
-- [Normas de Design de API](app/src/main/java/br/com/arml/composecollections/docs/API_DESIGN_GUIDELINES.md)
+Confira nossos guias técnicos no módulo principal:
+- [Mapa da API e Arquitetura](collections/docs/API_MAP.md)
+- [Guia de Migração](collections/docs/MIGRATION_GUIDE.md)
+- [Métricas de Performance](collections/docs/COMPOSE_COMPILER_METRICS_GUIDE.md)
+- [Normas de Design de API](collections/docs/API_DESIGN_GUIDELINES.md)
+- [Arquitetura Interna](collections/docs/ARCHITECTURE.md)
 
 ## 🤝 Contribuição
 

@@ -26,3 +26,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ComposeCollections"
 include(":app")
+include(":collections")

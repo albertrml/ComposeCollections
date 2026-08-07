@@ -41,7 +41,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import br.com.arml.composecollections.collections.samples.collections.*
+import br.com.arml.composecollections.app.samples.CustomControlSample
+import br.com.arml.composecollections.app.samples.ElasticScrollSample
+import br.com.arml.composecollections.app.samples.GridStickyHeaderSample
+import br.com.arml.composecollections.app.samples.HorizontalEdgedListSample
+import br.com.arml.composecollections.app.samples.HorizontalPagedGridSample
+import br.com.arml.composecollections.app.samples.HorizontalPagedListSample
+import br.com.arml.composecollections.app.samples.HorizontalStaggeredGridSample
+import br.com.arml.composecollections.app.samples.KeyboardNavigationSample
+import br.com.arml.composecollections.app.samples.ListWithIndicatorSample
+import br.com.arml.composecollections.app.samples.SnapScrollSample
+import br.com.arml.composecollections.app.samples.StickyHeaderListSample
+import br.com.arml.composecollections.app.samples.ThemedNavigationSample
+import br.com.arml.composecollections.app.samples.VerticalEdgedGridSample
+import br.com.arml.composecollections.app.samples.VerticalOverlayListSample
+import br.com.arml.composecollections.app.samples.VerticalPagedListSample
+import br.com.arml.composecollections.app.samples.VerticalStaggeredPinterestSample
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
