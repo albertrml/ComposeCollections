@@ -8,11 +8,11 @@
  * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package br.com.arml.composecollections.collections.layout.list
+package br.com.arml.composecollections.collections.layout.grid
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -23,68 +23,45 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import br.com.arml.composecollections.R
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
-import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class CollectionPagedListTest {
+class CollectionStaggeredGridTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private lateinit var upButtonTag: String
-    private lateinit var downButtonTag: String
+    private lateinit var pagedUpTag: String
+    private lateinit var pagedDownTag: String
 
     @Before
     fun setup() {
         InstrumentationRegistry.getInstrumentation().targetContext.apply {
-            upButtonTag = getString(R.string.pagedQuickNavList_upButton_testTag)
-            downButtonTag = getString(R.string.pagedQuickNavList_downButton_testTag)
+            pagedUpTag = getString(R.string.pagedQuickNavList_upButton_testTag)
+            pagedDownTag = getString(R.string.pagedQuickNavList_downButton_testTag)
         }
     }
 
     @Test
-    fun pagedList_vertical_shouldNavigateByPages() {
-        val state = LazyListState()
+    fun pagedStaggeredGrid_shouldNavigateByPages() {
+        val state = LazyStaggeredGridState()
         composeTestRule.setContent {
-            CollectionPagedList(
-                listState = state,
-                layoutSpec = CollectionLayoutSpec.Vertical(),
+            CollectionPagedStaggeredGrid(
+                cells = StaggeredGridCells.Fixed(2),
+                gridState = state,
                 navigationAlignment = CollectionAlignment.Bottom
             ) {
-                items(100) { Text("Item $it", modifier = Modifier.fillMaxWidth()) }
+                items(100) { Text("Item $it", modifier = Modifier.height(100.dp)) }
             }
         }
 
-        composeTestRule.onNodeWithTag(downButtonTag).performClick()
+        composeTestRule.onNodeWithTag(pagedDownTag).performClick()
         composeTestRule.waitForIdle()
         assert(state.firstVisibleItemIndex > 0)
 
-        composeTestRule.onNodeWithTag(upButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex == 0)
-    }
-
-    @Test
-    fun pagedList_horizontal_shouldNavigateByPages() {
-        val state = LazyListState()
-        composeTestRule.setContent {
-            CollectionPagedList(
-                listState = state,
-                layoutSpec = CollectionLayoutSpec.Horizontal(),
-                navigationAlignment = CollectionAlignment.End
-            ) {
-                items(100) { Text("Item $it", modifier = Modifier.width(200.dp)) }
-            }
-        }
-
-        composeTestRule.onNodeWithTag(downButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex > 0)
-
-        composeTestRule.onNodeWithTag(upButtonTag).performClick()
+        composeTestRule.onNodeWithTag(pagedUpTag).performClick()
         composeTestRule.waitForIdle()
         assert(state.firstVisibleItemIndex == 0)
     }

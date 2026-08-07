@@ -28,13 +28,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import br.com.arml.composecollections.R
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
+import br.com.arml.composecollections.collections.defaults.CollectionDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionDimensions
 import br.com.arml.composecollections.collections.defaults.CollectionIcons
 import br.com.arml.composecollections.collections.defaults.CollectionLabels
 import br.com.arml.composecollections.collections.defaults.CollectionTheme
-import br.com.arml.composecollections.collections.internal.CollectionRouter
 import br.com.arml.composecollections.collections.state.CollectionState
-import kotlinx.coroutines.CoroutineScope
 
 /**
  * High-level template that unifies theme, scaffold layout, and navigation routing.
@@ -43,14 +42,17 @@ import kotlinx.coroutines.CoroutineScope
 fun CollectionScaffold(
     modifier: Modifier = Modifier,
     isOverlay: Boolean = false,
-    navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
+    navigationAlignment: CollectionAlignment = CollectionAlignment.None,
     labels: CollectionLabels,
     icons: CollectionIcons,
     dimens: CollectionDimensions,
     collectionState: CollectionState,
     isHorizontal: Boolean,
+    expandLayout: Boolean = false,
     indicator: @Composable () -> Unit = {},
     topOverlay: @Composable () -> Unit = {},
+    backwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    forwardControl: @Composable ((CollectionState) -> Unit)? = null,
     container: @Composable (Modifier) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -78,14 +80,16 @@ fun CollectionScaffold(
                 verticalArrangement = Arrangement.spacedBy(dimensions.panelToContentSpacing)
             ) {
                 indicator()
-                Box(Modifier.weight(1f, fill = false)) {
+                Box(Modifier.weight(1f, fill = expandLayout)) {
                     CollectionNavigationFrame(
                         modifier = Modifier.fillMaxWidth(),
                         isOverlay = isOverlay,
+                        expandLayout = expandLayout,
                         navigationAlignment = navigationAlignment,
                         collectionState = collectionState,
-                        scope = scope,
                         isHorizontal = true,
+                        backwardControl = backwardControl,
+                        forwardControl = forwardControl,
                         container = container
                     )
                     Box(Modifier.testTag(stringResource(R.string.quickNav_scaffold_header_overlay_testTag))) {
@@ -99,14 +103,16 @@ fun CollectionScaffold(
                 modifier = modifier.then(keyboardModifier),
                 horizontalArrangement = Arrangement.spacedBy(dimensions.panelToContentSpacing)
             ) {
-                Box(Modifier.weight(1f, fill = false)) {
+                Box(Modifier.weight(1f, fill = expandLayout)) {
                     CollectionNavigationFrame(
                         modifier = Modifier.fillMaxWidth(),
                         isOverlay = isOverlay,
+                        expandLayout = expandLayout,
                         navigationAlignment = navigationAlignment,
                         collectionState = collectionState,
-                        scope = scope,
                         isHorizontal = false,
+                        backwardControl = backwardControl,
+                        forwardControl = forwardControl,
                         container = container
                     )
                     Box(Modifier.testTag(stringResource(R.string.quickNav_scaffold_header_overlay_testTag))) {
@@ -126,58 +132,81 @@ fun CollectionScaffold(
 internal fun CollectionNavigationFrame(
     modifier: Modifier = Modifier,
     isOverlay: Boolean = false,
-    navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
+    expandLayout: Boolean = false,
+    navigationAlignment: CollectionAlignment = CollectionAlignment.None,
     collectionState: CollectionState,
-    scope: CoroutineScope,
     isHorizontal: Boolean,
+    backwardControl: @Composable ((CollectionState) -> Unit)?,
+    forwardControl: @Composable ((CollectionState) -> Unit)?,
     container: @Composable (Modifier) -> Unit
 ) {
     CollectionLayout(
         modifier = modifier,
         isOverlay = isOverlay,
-        contentTop = {
-            CollectionRouter(
-                alignment = navigationAlignment,
-                target = CollectionAlignment.Top,
-                secondaryTarget = CollectionAlignment.Vertical,
-                collectionState = collectionState,
-                scope = scope,
-                isHorizontal = isHorizontal,
-                isStart = true
-            )
+        expandLayout = expandLayout,
+        contentTop = when {
+            backwardControl != null && !isHorizontal -> { { backwardControl(collectionState) } }
+            navigationAlignment == CollectionAlignment.Top || navigationAlignment == CollectionAlignment.Vertical -> {
+                {
+                    CollectionDefaults.DefaultNavigationControl(
+                        alignment = navigationAlignment,
+                        target = CollectionAlignment.Top,
+                        secondaryTarget = CollectionAlignment.Vertical,
+                        state = collectionState,
+                        isHorizontal = isHorizontal,
+                        isStart = true
+                    )
+                }
+            }
+            else -> null
         },
-        contentBottom = {
-            CollectionRouter(
-                alignment = navigationAlignment,
-                target = CollectionAlignment.Bottom,
-                secondaryTarget = CollectionAlignment.Vertical,
-                collectionState = collectionState,
-                scope = scope,
-                isHorizontal = isHorizontal,
-                isStart = false
-            )
+        contentBottom = when {
+            forwardControl != null && !isHorizontal -> { { forwardControl(collectionState) } }
+            navigationAlignment == CollectionAlignment.Bottom || navigationAlignment == CollectionAlignment.Vertical -> {
+                {
+                    CollectionDefaults.DefaultNavigationControl(
+                        alignment = navigationAlignment,
+                        target = CollectionAlignment.Bottom,
+                        secondaryTarget = CollectionAlignment.Vertical,
+                        state = collectionState,
+                        isHorizontal = isHorizontal,
+                        isStart = false
+                    )
+                }
+            }
+            else -> null
         },
-        contentLeft = {
-            CollectionRouter(
-                alignment = navigationAlignment,
-                target = CollectionAlignment.Start,
-                secondaryTarget = CollectionAlignment.Horizontal,
-                collectionState = collectionState,
-                scope = scope,
-                isHorizontal = isHorizontal,
-                isStart = true
-            )
+        contentLeft = when {
+            backwardControl != null && isHorizontal -> { { backwardControl(collectionState) } }
+            navigationAlignment == CollectionAlignment.Start || navigationAlignment == CollectionAlignment.Horizontal -> {
+                {
+                    CollectionDefaults.DefaultNavigationControl(
+                        alignment = navigationAlignment,
+                        target = CollectionAlignment.Start,
+                        secondaryTarget = CollectionAlignment.Horizontal,
+                        state = collectionState,
+                        isHorizontal = isHorizontal,
+                        isStart = true
+                    )
+                }
+            }
+            else -> null
         },
-        contentRight = {
-            CollectionRouter(
-                alignment = navigationAlignment,
-                target = CollectionAlignment.End,
-                secondaryTarget = CollectionAlignment.Horizontal,
-                collectionState = collectionState,
-                scope = scope,
-                isHorizontal = isHorizontal,
-                isStart = false
-            )
+        contentRight = when {
+            forwardControl != null && isHorizontal -> { { forwardControl(collectionState) } }
+            navigationAlignment == CollectionAlignment.End || navigationAlignment == CollectionAlignment.Horizontal -> {
+                {
+                    CollectionDefaults.DefaultNavigationControl(
+                        alignment = navigationAlignment,
+                        target = CollectionAlignment.End,
+                        secondaryTarget = CollectionAlignment.Horizontal,
+                        state = collectionState,
+                        isHorizontal = isHorizontal,
+                        isStart = false
+                    )
+                }
+            }
+            else -> null
         }
     ) {
         container(Modifier)

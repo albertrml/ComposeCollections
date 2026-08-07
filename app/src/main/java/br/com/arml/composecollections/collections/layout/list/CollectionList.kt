@@ -19,10 +19,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
-import br.com.arml.composecollections.R
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionAnimationMode
+import br.com.arml.composecollections.collections.defaults.CollectionDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionDimensionDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionDimensions
 import br.com.arml.composecollections.collections.defaults.CollectionIconDefaults
@@ -39,27 +38,31 @@ import br.com.arml.composecollections.collections.state.CollectionState
 import br.com.arml.composecollections.collections.state.rememberCollectionListState
 
 /**
- * A highly customizable list that navigates through content page-by-page.
+ * A highly customizable list container.
  */
 @Composable
-fun CollectionPagedList(
+fun CollectionList(
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
-    collectionState: CollectionState = rememberCollectionListState(listState, CollectionMode.Paged),
-    layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
-    navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
+    mode: CollectionMode = CollectionMode.Paged,
     animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
+    collectionState: CollectionState = rememberCollectionListState(listState, mode, animationMode),
+    layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
+    navigationAlignment: CollectionAlignment = CollectionAlignment.None,
     isOverlay: Boolean = false,
     showIndicator: Boolean = false,
-    labels: CollectionLabels = LocalCollectionLabels.current ?: CollectionLabelDefaults.pagedLabels(),
+    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
+    labels: CollectionLabels = LocalCollectionLabels.current ?: CollectionLabelDefaults.defaultLabels(mode),
     icons: CollectionIcons = CollectionIconDefaults.default,
     dimens: CollectionDimensions = CollectionDimensionDefaults.default,
+    backwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    forwardControl: @Composable ((CollectionState) -> Unit)? = null,
     content: LazyListScope.() -> Unit,
 ) {
     val isHorizontal = layoutSpec is CollectionLayoutSpec.Horizontal
 
     CollectionScaffold(
-        modifier = modifier.testTag(stringResource(R.string.quickNavList_component_testTag)),
+        modifier = modifier.testTag(CollectionDefaults.ComponentTestTag),
         isOverlay = isOverlay,
         navigationAlignment = navigationAlignment,
         labels = labels,
@@ -67,6 +70,9 @@ fun CollectionPagedList(
         dimens = dimens,
         collectionState = collectionState,
         isHorizontal = isHorizontal,
+        expandLayout = expandLayout,
+        backwardControl = backwardControl,
+        forwardControl = forwardControl,
         indicator = {
             if (showIndicator) {
                 CollectionLinearIndicator(
@@ -95,3 +101,65 @@ fun CollectionPagedList(
         }
     }
 }
+
+/**
+ * A specialized list that scrolls through content page-by-page.
+ */
+@Composable
+fun CollectionPagedList(
+    modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
+    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
+    layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
+    navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
+    isOverlay: Boolean = false,
+    showIndicator: Boolean = false,
+    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
+    backwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    forwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    content: LazyListScope.() -> Unit
+) = CollectionList(
+    modifier = modifier,
+    listState = listState,
+    mode = CollectionMode.Paged,
+    animationMode = animationMode,
+    layoutSpec = layoutSpec,
+    navigationAlignment = navigationAlignment,
+    isOverlay = isOverlay,
+    showIndicator = showIndicator,
+    expandLayout = expandLayout,
+    backwardControl = backwardControl,
+    forwardControl = forwardControl,
+    content = content
+)
+
+/**
+ * A specialized list that provides controls to jump directly to extremes.
+ */
+@Composable
+fun CollectionEdgedList(
+    modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
+    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
+    layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
+    navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
+    isOverlay: Boolean = false,
+    showIndicator: Boolean = false,
+    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
+    backwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    forwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    content: LazyListScope.() -> Unit
+) = CollectionList(
+    modifier = modifier,
+    listState = listState,
+    mode = CollectionMode.Edged,
+    animationMode = animationMode,
+    layoutSpec = layoutSpec,
+    navigationAlignment = navigationAlignment,
+    isOverlay = isOverlay,
+    showIndicator = showIndicator,
+    expandLayout = expandLayout,
+    backwardControl = backwardControl,
+    forwardControl = forwardControl,
+    content = content
+)

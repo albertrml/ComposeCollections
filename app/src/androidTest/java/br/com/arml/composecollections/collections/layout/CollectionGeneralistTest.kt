@@ -8,84 +8,80 @@
  * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package br.com.arml.composecollections.collections.layout.list
+package br.com.arml.composecollections.collections.layout
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import br.com.arml.composecollections.R
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
-import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
+import br.com.arml.composecollections.collections.defaults.CollectionMode
+import br.com.arml.composecollections.collections.layout.list.CollectionList
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class CollectionPagedListTest {
+class CollectionGeneralistTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private lateinit var upButtonTag: String
-    private lateinit var downButtonTag: String
+    private lateinit var pagedDownTag: String
+    private lateinit var edgedDownTag: String
 
     @Before
     fun setup() {
         InstrumentationRegistry.getInstrumentation().targetContext.apply {
-            upButtonTag = getString(R.string.pagedQuickNavList_upButton_testTag)
-            downButtonTag = getString(R.string.pagedQuickNavList_downButton_testTag)
+            pagedDownTag = getString(R.string.pagedQuickNavList_downButton_testTag)
+            edgedDownTag = getString(R.string.quickNavList_downButton_testTag)
         }
     }
 
     @Test
-    fun pagedList_vertical_shouldNavigateByPages() {
-        val state = LazyListState()
+    fun collectionList_withPagedMode_shouldShowPagedButtons() {
         composeTestRule.setContent {
-            CollectionPagedList(
-                listState = state,
-                layoutSpec = CollectionLayoutSpec.Vertical(),
+            CollectionList(
+                mode = CollectionMode.Paged,
                 navigationAlignment = CollectionAlignment.Bottom
             ) {
-                items(100) { Text("Item $it", modifier = Modifier.fillMaxWidth()) }
+                items(100) { Text("Item $it") }
             }
         }
 
-        composeTestRule.onNodeWithTag(downButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex > 0)
-
-        composeTestRule.onNodeWithTag(upButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex == 0)
+        composeTestRule.onNodeWithTag(pagedDownTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(edgedDownTag).assertDoesNotExist()
     }
 
     @Test
-    fun pagedList_horizontal_shouldNavigateByPages() {
-        val state = LazyListState()
+    fun collectionList_withEdgedMode_shouldShowEdgedButtons() {
         composeTestRule.setContent {
-            CollectionPagedList(
-                listState = state,
-                layoutSpec = CollectionLayoutSpec.Horizontal(),
-                navigationAlignment = CollectionAlignment.End
+            CollectionList(
+                mode = CollectionMode.Edged,
+                navigationAlignment = CollectionAlignment.Bottom
             ) {
-                items(100) { Text("Item $it", modifier = Modifier.width(200.dp)) }
+                items(100) { Text("Item $it") }
             }
         }
 
-        composeTestRule.onNodeWithTag(downButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex > 0)
+        composeTestRule.onNodeWithTag(edgedDownTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(pagedDownTag).assertDoesNotExist()
+    }
 
-        composeTestRule.onNodeWithTag(upButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex == 0)
+    @Test
+    fun collectionList_withNoneAlignment_shouldShowNoButtons() {
+        composeTestRule.setContent {
+            CollectionList(
+                navigationAlignment = CollectionAlignment.None
+            ) {
+                items(100) { Text("Item $it") }
+            }
+        }
+
+        composeTestRule.onNodeWithTag(pagedDownTag).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(edgedDownTag).assertDoesNotExist()
     }
 }

@@ -8,10 +8,19 @@ The library follows a strict layered approach to ensure consistency and reuse.
 
 ```mermaid
 graph TD
-    subgraph "Public API (Specialized Components)"
-        List[CollectionPagedList / CollectionEdgedList]
-        Grid[CollectionPagedGrid / CollectionEdgedGrid]
-        Staggered[CollectionPagedStaggeredGrid / CollectionEdgedStaggeredGrid]
+    subgraph "Public API (Core Containers)"
+        List[CollectionList]
+        Grid[CollectionGrid]
+        Stag[CollectionStaggeredGrid]
+    end
+
+    subgraph "Sugar Functions (Specialists)"
+        PList[CollectionPagedList]
+        EList[CollectionEdgedList]
+        PGrid[CollectionPagedGrid]
+        EGrid[CollectionEdgedGrid]
+        PStag[CollectionPagedStaggeredGrid]
+        EStag[CollectionEdgedStaggeredGrid]
     end
 
     subgraph "Foundation Layer (Layout Engine)"
@@ -29,92 +38,91 @@ graph TD
 
     subgraph "Theming & Defaults"
         Theme[CollectionTheme]
-        Spec[CollectionLayoutSpec]
-        Labels[CollectionLabels]
-        Icons[CollectionIcons]
+        Defaults[CollectionDefaults]
+    end
+    
+    subgraph "Atomic Components"
+        ScrollBtn[CollectionScrollButton]
+        BaseBtn[CollectionButton]
     end
 
     %% Relationships
+    PList -- calls --> List
+    EList -- calls --> List
+    PGrid -- calls --> Grid
+    EGrid -- calls --> Grid
+    PStag -- calls --> Stag
+    EStag -- calls --> Stag
+    
     List --> Scaffold
     Grid --> Scaffold
-    Staggered --> Scaffold
+    Stag --> Scaffold
     
     Scaffold --> Frame
     Frame --> Layout
     
     Scaffold -- consumes --> Theme
-    List -- provides --> StateList
-    Grid -- provides --> StateGrid
-    Staggered -- provides --> StateStag
+    Scaffold -- "manages slots" --> backward[backwardControl]
+    Scaffold -- "manages slots" --> forward[forwardControl]
     
-    StateList -- implements --> StateI
-    StateGrid -- implements --> StateI
-    StateStag -- implements --> StateI
+    Defaults -- "factory for" --> backward
+    Defaults -- "factory for" --> forward
     
     Scaffold -- interacts via --> StateI
+    ScrollBtn -- controls --> StateI
 ```
 
 ---
 
 ## 2. Functional Matrix
 
-This table shows which features are available across the public components.
+| Component | Paged Mode | Edged Mode | Custom Slots (Slot API) | Hardware Shortcuts | Sticky Headers | Layout Expansion |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **CollectionList** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **CollectionGrid** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **CollectionStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-| Component | Orientation (V/H) | Progress Indicator | Animation Presets | Hardware Shortcuts | Sticky Headers |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **CollectionPagedList** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **CollectionEdgedList** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **CollectionPagedGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **CollectionEdgedGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **CollectionPagedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **CollectionEdgedStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ✅ |
+> [!NOTE]
+> Specialist components (`CollectionPagedList`, etc.) are pre-configured instances of the base containers with `navigationAlignment = Bottom` and the corresponding `mode` enabled.
 
 ---
 
 ## 3. Package Taxonomy & Responsibilities
 
+### `.collections.layout.list` / `.grid`
+- **Goal**: High-level public containers.
+- **Organization**: Consolidated files (`CollectionList.kt`, etc.) containing both the generalist engine and specialist "Sugar Functions".
+
 ### `.collections.layout.foundation`
 - **Goal**: Structural integrity and input orchestration.
-- **Key Files**: 
-    - `CollectionLayout`: Atomic placement of content and slots.
-    - `CollectionScaffold`: High-level orchestration, theme injection, and **hardware key event mapping**.
-- **Dependency**: Depends on `CollectionTheme`, `CollectionState`, and `internal` routing.
+- **Responsibility**: `CollectionScaffold` manages the **Slot API Sovereignty** (User controls override library defaults) and maps hardware key events.
 
 ### `.collections.state`
 - **Goal**: Behavioral logic and scroll control.
-- **Key Files**: `CollectionState` (The Contract), and concrete implementations for List, Grid, and Staggered.
-- **Design Pattern**: **State Hoisting**. Decouples "when to show buttons" and "how to move" from the UI.
 
-### `.collections.internal`
-- **Goal**: Encapsulation (The "Kitchen").
-- **Responsibilities**: Routing buttons (`CollectionRouter`), icon resolution, and low-level panel assembly.
-- **Access**: Marked as `internal`. Not visible to library consumers.
+### `.collections.components`
+- **Goal**: Atomic reusable building blocks.
+- **Key Component**: `CollectionScrollButton` - Encapsulates complex visibility and scroll physics.
 
 ### `.collections.defaults`
-- **Goal**: Global configuration and presets.
-- **Key Files**: 
-    - `CollectionLayout.kt`: Navigation alignments and behavior modes (`Edged`, `Paged`).
-    - `CollectionAnimation.kt`: Animation modes (`Snap`, `Elastic`) and physics presets.
-    - `CollectionVisibilityTransitions.kt`: Visibility transitions (`fadeIn`, `fadeOut`).
-    - `CollectionTheme.kt`: Main theming engine and `CompositionLocal` providers.
-    - `CollectionLabelDefaults.kt`: Default localized strings and test tags.
+- **Goal**: Global configuration and design tokens.
+- **Key Object**: `CollectionDefaults` - Central source of truth for animation specs, expansion policies, and default control factories (`DefaultNavigationControl`).
 
 ---
 
-## 4. Key Data Relationships
+## 4. Slot API Priority & Sovereignty
 
-- **CollectionTheme -> UI**: Provides colors, icons, and labels via `CompositionLocal`.
-- **CollectionState -> Scaffold**: 
-    - The Scaffold consumes the entire `CollectionState` object to manage visibility and navigation.
-    - On user clicks or **hardware key events** (`PageUp/Down`, `Home/End`), the Scaffold triggers the corresponding `animateScrollTo...` methods.
-- **CollectionLayoutSpec -> LazyContainer**: Controls whether the content is a `LazyColumn`, `LazyRow`, or a `Grid` variant.
+The library follows a strict precedence rule for UI rendering:
+
+1.  **Direct Sovereignty**: If a Composable is provided to `backwardControl` or `forwardControl`, it is rendered **immediately**, bypassing all library internal logic for that slot.
+2.  **Configured Alignment**: If a slot is null, the library checks `navigationAlignment`. If it matches the slot's position, it renders the default control via `CollectionDefaults`.
+3.  **Lite Execution**: If the alignment is `None` (default) and no controls are provided, the container renders **zero navigation UI**, acting as a pure performance-enhanced replacement for native `Lazy` components.
 
 ---
 
 ## 5. Extensibility Map
 
-If you want to customize the library, here is where you should look:
-
-1. **Visual Customization**: Use `CollectionTheme` in the `.defaults` package.
-2. **New Container Support**: Use `CollectionScaffold` in the `.foundation` package.
-3. **Custom Navigation Logic**: Implement `CollectionState` in the `.state` package.
+1. **Total UI Override**: Use `backwardControl/forwardControl`.
+2. **Behavioral Switch**: Change `mode` between `Paged` (scroll by viewport) and `Edged` (scroll to extremes).
+3. **Physical Feel**: Toggle `animationMode` to switch between `Default`, `Snap` (precise), or `Elastic` (bouncy) scroll physics.
+4. **Spatial Footprint**: Use `expandLayout` to switch between a **Tight** container (wraps content) or a **Stretch** container (fills screen).

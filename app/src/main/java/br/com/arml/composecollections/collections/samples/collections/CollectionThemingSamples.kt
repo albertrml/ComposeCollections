@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionLabels
 import br.com.arml.composecollections.collections.defaults.CollectionTheme
 import br.com.arml.composecollections.collections.defaults.CollectionTransitions
@@ -51,7 +52,10 @@ fun ThemedNavigationSample() {
                 exit = shrinkOut()
             )
         ) {
-            CollectionPagedList(modifier = Modifier.fillMaxSize()) {
+            CollectionPagedList(
+                modifier = Modifier.fillMaxSize(),
+                navigationAlignment = CollectionAlignment.Bottom,
+            ) {
                 items(50) { ListItem(it) }
             }
         }

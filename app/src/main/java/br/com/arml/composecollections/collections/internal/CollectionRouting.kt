@@ -11,18 +11,23 @@
 package br.com.arml.composecollections.collections.internal
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionTheme
 import br.com.arml.composecollections.collections.state.CollectionState
 import kotlinx.coroutines.CoroutineScope
 
+/**
+ * A router that decides which navigation UI to show based on alignment and direction.
+ * This is now public to be used in [br.com.arml.composecollections.collections.defaults.CollectionDefaults].
+ */
 @Composable
-internal fun CollectionRouter(
+fun CollectionNavigationRouter(
     alignment: CollectionAlignment,
     target: CollectionAlignment,
     secondaryTarget: CollectionAlignment,
     collectionState: CollectionState,
-    scope: CoroutineScope,
+    scope: CoroutineScope = rememberCoroutineScope(),
     isHorizontal: Boolean,
     isStart: Boolean
 ) {

@@ -14,11 +14,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import br.com.arml.composecollections.collections.layout.list.CollectionPagedList
+import br.com.arml.composecollections.collections.layout.grid.CollectionGrid
+import br.com.arml.composecollections.collections.layout.grid.CollectionStaggeredGrid
+import br.com.arml.composecollections.collections.layout.list.CollectionList
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,12 +36,12 @@ class CollectionStateTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun listState_scrollProgress_shouldBeCorrect() {
+    fun listState_scrollProgress_shouldCalculateCorrectly() {
         val state = LazyListState()
         val collectionState = CollectionListState(state)
 
         composeTestRule.setContent {
-            CollectionPagedList(
+            CollectionList(
                 listState = state,
                 collectionState = collectionState
             ) {
@@ -42,8 +49,58 @@ class CollectionStateTest {
             }
         }
 
-        composeTestRule.runOnIdle {
-            assert(collectionState.scrollProgress == 0f)
+        composeTestRule.runOnIdle { assert(collectionState.scrollProgress == 0f) }
+
+        composeTestRule.runOnIdle { runBlocking { state.scrollToItem(50) } }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnIdle { assert(collectionState.scrollProgress > 0.4f && collectionState.scrollProgress < 0.6f) }
+
+        composeTestRule.runOnIdle { runBlocking { state.scrollToItem(100) } }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnIdle { assert(collectionState.scrollProgress == 1f) }
+    }
+
+    @Test
+    fun gridState_scrollProgress_shouldCalculateCorrectly() {
+        val state = LazyGridState()
+        val collectionState = CollectionGridState(state)
+
+        composeTestRule.setContent {
+            CollectionGrid(
+                cells = GridCells.Fixed(2),
+                gridState = state,
+                collectionState = collectionState
+            ) {
+                items(100) { Box(Modifier.height(100.dp).fillMaxWidth()) }
+            }
         }
+
+        composeTestRule.runOnIdle { assert(collectionState.scrollProgress == 0f) }
+
+        composeTestRule.runOnIdle { runBlocking { state.scrollToItem(99) } }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnIdle { assert(collectionState.scrollProgress == 1f) }
+    }
+
+    @Test
+    fun staggeredGridState_scrollProgress_shouldCalculateCorrectly() {
+        val state = LazyStaggeredGridState()
+        val collectionState = CollectionStaggeredGridState(state)
+
+        composeTestRule.setContent {
+            CollectionStaggeredGrid(
+                cells = StaggeredGridCells.Fixed(2),
+                gridState = state,
+                collectionState = collectionState
+            ) {
+                items(100) { Box(Modifier.height(100.dp).fillMaxWidth()) }
+            }
+        }
+
+        composeTestRule.runOnIdle { assert(collectionState.scrollProgress == 0f) }
+
+        composeTestRule.runOnIdle { runBlocking { state.scrollToItem(99) } }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnIdle { assert(collectionState.scrollProgress == 1f) }
     }
 }

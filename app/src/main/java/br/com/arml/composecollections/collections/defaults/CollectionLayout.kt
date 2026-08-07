@@ -20,11 +20,19 @@ import androidx.compose.ui.Alignment
  */
 @Stable
 sealed class CollectionAlignment {
+    /** No navigation controls are displayed. */
+    object None : CollectionAlignment()
+    /** Place both navigation controls at the top (or start). */
     object Top : CollectionAlignment()
+    /** Place both navigation controls at the bottom (or end). */
     object Bottom : CollectionAlignment()
+    /** Place both navigation controls at the start. */
     object Start : CollectionAlignment()
+    /** Place both navigation controls at the end. */
     object End : CollectionAlignment()
+    /** Place controls horizontally opposite (e.g., Start and End). */
     object Horizontal : CollectionAlignment()
+    /** Place controls vertically opposite (e.g., Top and Bottom). */
     object Vertical : CollectionAlignment()
 }
 

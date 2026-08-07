@@ -16,7 +16,7 @@ O **ComposeCollections** evoluiu de uma ferramenta de navegação para um framew
 *   **Sticky Headers for Grids**: Suporte exclusivo para cabeçalhos fixos em grades e staggered grids.
 *   **Acessibilidade & Hardware**: Suporte nativo para teclados e D-pads (TV).
 *   **Industrial Performance**: Componentes 100% otimizados pelo compilador do Compose (Skippable).
-*   **Totalmente Customizável**: Sistema de temas completo para ícones, rótulos, animações e dimensões.
+*   **Totalmente Customizável**: Sistema de temas completo e **Slot API** para injeção de controles customizados (ex: FABs).
 
 ## 📦 Instalação
 
@@ -44,7 +44,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    implementation("br.com.arml.composecollections:composecollections:0.2.7")
+    implementation("br.com.arml.composecollections:composecollections:0.2.8")
 }
 ```
 

@@ -10,73 +10,54 @@
 
 package br.com.arml.composecollections.collections.layout
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performKeyInput
-import androidx.compose.ui.test.pressKey
-import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import br.com.arml.composecollections.collections.defaults.CollectionDefaults
-import br.com.arml.composecollections.collections.layout.grid.CollectionPagedGrid
 import br.com.arml.composecollections.collections.layout.list.CollectionPagedList
-import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class CollectionKeyboardTest {
+class CollectionLayoutTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
     private val componentTag = CollectionDefaults.ComponentTestTag
 
-    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun list_pageDownKey_shouldNavigateForward() {
-        val state = LazyListState()
+    fun collectionPagedList_withExpandLayoutFalse_shouldWrapHeight() {
         composeTestRule.setContent {
-            CollectionPagedList(listState = state) {
-                items(100) { Text("Item $it", modifier = Modifier.height(100.dp).fillMaxWidth()) }
+            CollectionPagedList(
+                modifier = Modifier.fillMaxWidth(),
+                expandLayout = false // Tight layout
+            ) {
+                item { Text("Small Content", modifier = Modifier.height(100.dp)) }
             }
         }
 
-        composeTestRule.onNodeWithTag(componentTag).requestFocus()
-        composeTestRule.onNodeWithTag(componentTag).performKeyInput { pressKey(Key.PageDown) }
-        
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex > 0)
+        composeTestRule.onNodeWithTag(componentTag).assertHeightIsAtLeast(100.dp)
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun grid_homeKey_shouldNavigateToStart() {
-        val state = LazyGridState()
+    fun collectionPagedList_withExpandLayoutTrue_shouldFillHeight() {
         composeTestRule.setContent {
-            CollectionPagedGrid(cells = GridCells.Fixed(2), gridState = state) {
-                items(100) { Text("Item $it", modifier = Modifier.height(100.dp)) }
+            CollectionPagedList(
+                modifier = Modifier.fillMaxSize(),
+                expandLayout = true // Stretch layout
+            ) {
+                item { Text("Small Content", modifier = Modifier.height(100.dp)) }
             }
         }
 
-        composeTestRule.runOnIdle {
-            runBlocking { state.scrollToItem(50) }
-        }
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithTag(componentTag).requestFocus()
-        composeTestRule.onNodeWithTag(componentTag).performKeyInput { pressKey(Key.MoveHome) }
-        
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex == 0)
+        composeTestRule.onNodeWithTag(componentTag).assertHeightIsAtLeast(300.dp)
     }
 }

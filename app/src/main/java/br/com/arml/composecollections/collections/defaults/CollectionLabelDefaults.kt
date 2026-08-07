@@ -27,6 +27,12 @@ data class CollectionLabels(
 
 object CollectionLabelDefaults {
     @Composable
+    fun defaultLabels(mode: CollectionMode) = when (mode) {
+        CollectionMode.Edged -> edgedLabels()
+        CollectionMode.Paged -> pagedLabels()
+    }
+
+    @Composable
     fun edgedLabels() = CollectionLabels(
         previousLabel = stringResource(R.string.quickNavList_upButton_text),
         previousContentDescription = stringResource(R.string.quickNavList_upButton_contentDescription),

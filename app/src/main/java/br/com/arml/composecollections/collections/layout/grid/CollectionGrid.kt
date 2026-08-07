@@ -13,21 +13,20 @@ package br.com.arml.composecollections.collections.layout.grid
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
-import br.com.arml.composecollections.R
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionAnimationMode
+import br.com.arml.composecollections.collections.defaults.CollectionDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionDimensionDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionDimensions
 import br.com.arml.composecollections.collections.defaults.CollectionIconDefaults
@@ -41,33 +40,36 @@ import br.com.arml.composecollections.collections.defaults.CollectionTheme
 import br.com.arml.composecollections.collections.defaults.LocalCollectionLabels
 import br.com.arml.composecollections.collections.internal.CollectionLinearIndicator
 import br.com.arml.composecollections.collections.layout.foundation.CollectionScaffold
-import br.com.arml.composecollections.collections.layout.grid.scope.CollectionStaggeredGridScope
-import br.com.arml.composecollections.collections.layout.grid.scope.CollectionStaggeredGridScopeImpl
+import br.com.arml.composecollections.collections.layout.grid.scope.CollectionGridScope
+import br.com.arml.composecollections.collections.layout.grid.scope.CollectionGridScopeImpl
 import br.com.arml.composecollections.collections.layout.grid.scope.renderCollectionItems
 import br.com.arml.composecollections.collections.state.CollectionState
-import br.com.arml.composecollections.collections.state.rememberCollectionStaggeredGridState
+import br.com.arml.composecollections.collections.state.rememberCollectionGridState
 
 /**
- * A highly customizable staggered grid that provides navigation controls to jump directly to the
- * start or end of the collection.
+ * A highly customizable grid container.
  */
 @Composable
-fun CollectionEdgedStaggeredGrid(
+fun CollectionGrid(
+    cells: GridCells,
     modifier: Modifier = Modifier,
-    gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
-    collectionState: CollectionState = rememberCollectionStaggeredGridState(gridState, CollectionMode.Edged),
-    layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
-    navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
+    gridState: LazyGridState = rememberLazyGridState(),
+    mode: CollectionMode = CollectionMode.Paged,
     animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
-    cells: StaggeredGridCells,
+    collectionState: CollectionState = rememberCollectionGridState(gridState, mode, animationMode),
+    layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
+    navigationAlignment: CollectionAlignment = CollectionAlignment.None,
     isOverlay: Boolean = false,
     showIndicator: Boolean = false,
-    labels: CollectionLabels = LocalCollectionLabels.current ?: CollectionLabelDefaults.edgedLabels(),
+    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
+    labels: CollectionLabels = LocalCollectionLabels.current ?: CollectionLabelDefaults.defaultLabels(mode),
     icons: CollectionIcons = CollectionIconDefaults.default,
     dimens: CollectionDimensions = CollectionDimensionDefaults.default,
-    content: CollectionStaggeredGridScope.() -> Unit
+    backwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    forwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    content: CollectionGridScope.() -> Unit
 ) {
-    val gridScope = remember(content) { CollectionStaggeredGridScopeImpl().apply(content) }
+    val gridScope = remember(content) { CollectionGridScopeImpl().apply(content) }
     val isHorizontal = layoutSpec is CollectionLayoutSpec.Horizontal
 
     val currentHeaderIndex by remember {
@@ -77,7 +79,7 @@ fun CollectionEdgedStaggeredGrid(
     }
 
     CollectionScaffold(
-        modifier = modifier.testTag(stringResource(R.string.quickNavList_component_testTag)),
+        modifier = modifier.testTag(CollectionDefaults.ComponentTestTag),
         isOverlay = isOverlay,
         navigationAlignment = navigationAlignment,
         labels = labels,
@@ -85,6 +87,9 @@ fun CollectionEdgedStaggeredGrid(
         dimens = dimens,
         collectionState = collectionState,
         isHorizontal = isHorizontal,
+        expandLayout = expandLayout,
+        backwardControl = backwardControl,
+        forwardControl = forwardControl,
         indicator = {
             if (showIndicator) {
                 CollectionLinearIndicator(
@@ -103,26 +108,92 @@ fun CollectionEdgedStaggeredGrid(
         container = { containerModifier ->
             val dimensions = CollectionTheme.dimensions
             when (layoutSpec) {
-                is CollectionLayoutSpec.Vertical -> LazyVerticalStaggeredGrid(
+                is CollectionLayoutSpec.Vertical -> LazyVerticalGrid(
                     columns = cells,
                     modifier = containerModifier.fillMaxWidth(),
                     state = gridState,
-                    verticalItemSpacing = dimensions.itemSpacing,
+                    verticalArrangement = layoutSpec.arrangement,
                     horizontalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
                 ) {
                     renderCollectionItems(gridScope.items)
                 }
 
-                is CollectionLayoutSpec.Horizontal -> LazyHorizontalStaggeredGrid(
+                is CollectionLayoutSpec.Horizontal -> LazyHorizontalGrid(
                     rows = cells,
                     modifier = containerModifier.fillMaxWidth(),
                     state = gridState,
-                    verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing),
-                    horizontalItemSpacing = dimensions.itemSpacing
+                    horizontalArrangement = layoutSpec.arrangement,
+                    verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
                 ) {
                     renderCollectionItems(gridScope.items)
                 }
             }
-        },
+        }
     )
 }
+
+/**
+ * A specialized grid that scrolls page-by-page.
+ */
+@Composable
+fun CollectionPagedGrid(
+    cells: GridCells,
+    modifier: Modifier = Modifier,
+    gridState: LazyGridState = rememberLazyGridState(),
+    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
+    layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
+    navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
+    isOverlay: Boolean = false,
+    showIndicator: Boolean = false,
+    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
+    backwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    forwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    content: CollectionGridScope.() -> Unit
+) = CollectionGrid(
+    cells = cells,
+    modifier = modifier,
+    gridState = gridState,
+    mode = CollectionMode.Paged,
+    animationMode = animationMode,
+    layoutSpec = layoutSpec,
+    navigationAlignment = navigationAlignment,
+    isOverlay = isOverlay,
+    showIndicator = showIndicator,
+    expandLayout = expandLayout,
+    backwardControl = backwardControl,
+    forwardControl = forwardControl,
+    content = content
+)
+
+/**
+ * A specialized grid that provides jump-to-extreme controls.
+ */
+@Composable
+fun CollectionEdgedGrid(
+    cells: GridCells,
+    modifier: Modifier = Modifier,
+    gridState: LazyGridState = rememberLazyGridState(),
+    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
+    layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
+    navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
+    isOverlay: Boolean = false,
+    showIndicator: Boolean = false,
+    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
+    backwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    forwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    content: CollectionGridScope.() -> Unit
+) = CollectionGrid(
+    cells = cells,
+    modifier = modifier,
+    gridState = gridState,
+    mode = CollectionMode.Edged,
+    animationMode = animationMode,
+    layoutSpec = layoutSpec,
+    navigationAlignment = navigationAlignment,
+    isOverlay = isOverlay,
+    showIndicator = showIndicator,
+    expandLayout = expandLayout,
+    backwardControl = backwardControl,
+    forwardControl = forwardControl,
+    content = content
+)

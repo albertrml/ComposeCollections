@@ -69,7 +69,8 @@ enum class Screen {
     ElasticScroll,
     SnapScroll,
     KeyboardInput,
-    ThemedSample
+    ThemedSample,
+    CustomControl
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,6 +128,7 @@ fun GalleryApp() {
                     Screen.SnapScroll -> SnapScrollSample()
                     Screen.KeyboardInput -> KeyboardNavigationSample()
                     Screen.ThemedSample -> ThemedNavigationSample()
+                    Screen.CustomControl -> CustomControlSample()
                 }
             }
         }
@@ -174,7 +176,8 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
         item { CategoryHeader("Customization") }
         items(listOf(
             "Scroll Indicators" to Screen.ListWithIndicator,
-            "Custom Labels & Icons" to Screen.ThemedSample
+            "Custom Labels & Icons" to Screen.ThemedSample,
+            "Custom Control (FAB)" to Screen.CustomControl
         )) { (label, screen) ->
             SampleItem(label, onClick = { onNavigate(screen) })
         }

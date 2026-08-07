@@ -11,7 +11,7 @@
 package br.com.arml.composecollections.collections.layout.list
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
@@ -30,7 +30,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class CollectionPagedListTest {
+class CollectionEdgedListTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -40,52 +40,36 @@ class CollectionPagedListTest {
     @Before
     fun setup() {
         InstrumentationRegistry.getInstrumentation().targetContext.apply {
-            upButtonTag = getString(R.string.pagedQuickNavList_upButton_testTag)
-            downButtonTag = getString(R.string.pagedQuickNavList_downButton_testTag)
+            upButtonTag = getString(R.string.quickNavList_upButton_testTag)
+            downButtonTag = getString(R.string.quickNavList_downButton_testTag)
         }
     }
 
     @Test
-    fun pagedList_vertical_shouldNavigateByPages() {
+    fun edgedList_shouldJumpToExtremes() {
         val state = LazyListState()
         composeTestRule.setContent {
-            CollectionPagedList(
+            CollectionEdgedList(
                 listState = state,
                 layoutSpec = CollectionLayoutSpec.Vertical(),
                 navigationAlignment = CollectionAlignment.Bottom
             ) {
-                items(100) { Text("Item $it", modifier = Modifier.fillMaxWidth()) }
+                items(100) { Text("Item $it", modifier = Modifier.fillMaxWidth().height(100.dp)) }
             }
         }
 
+        // Click "End"
         composeTestRule.onNodeWithTag(downButtonTag).performClick()
         composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex > 0)
-
-        composeTestRule.onNodeWithTag(upButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex == 0)
-    }
-
-    @Test
-    fun pagedList_horizontal_shouldNavigateByPages() {
-        val state = LazyListState()
-        composeTestRule.setContent {
-            CollectionPagedList(
-                listState = state,
-                layoutSpec = CollectionLayoutSpec.Horizontal(),
-                navigationAlignment = CollectionAlignment.End
-            ) {
-                items(100) { Text("Item $it", modifier = Modifier.width(200.dp)) }
-            }
+        composeTestRule.runOnIdle {
+            assert(state.firstVisibleItemIndex > 80)
         }
 
-        composeTestRule.onNodeWithTag(downButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex > 0)
-
+        // Click "Start"
         composeTestRule.onNodeWithTag(upButtonTag).performClick()
         composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex == 0)
+        composeTestRule.runOnIdle {
+            assert(state.firstVisibleItemIndex == 0)
+        }
     }
 }

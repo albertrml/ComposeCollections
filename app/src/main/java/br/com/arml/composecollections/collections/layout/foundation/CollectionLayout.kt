@@ -23,53 +23,62 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import br.com.arml.composecollections.collections.defaults.CollectionTheme
 
+/**
+ * Advanced layout engine for collections.
+ */
 @Composable
 fun CollectionLayout(
     modifier: Modifier = Modifier,
     isOverlay: Boolean = true,
-    contentTop: @Composable (Modifier) -> Unit = {},
-    contentBottom: @Composable (Modifier) -> Unit = {},
-    contentLeft: @Composable (Modifier) -> Unit = {},
-    contentRight: @Composable (Modifier) -> Unit = {},
+    expandLayout: Boolean = false,
+    contentTop: (@Composable (Modifier) -> Unit)? = null,
+    contentBottom: (@Composable (Modifier) -> Unit)? = null,
+    contentLeft: (@Composable (Modifier) -> Unit)? = null,
+    contentRight: (@Composable (Modifier) -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit = {},
 ) {
     val panelSpacing = CollectionTheme.dimensions.panelToContentSpacing
+    
     if (isOverlay) {
         Box(
             modifier = modifier,
             contentAlignment = Alignment.Center
         ) {
             content(PaddingValues(0.dp))
-            Box(Modifier.align(Alignment.TopCenter)) { contentTop(Modifier) }
-            Box(Modifier.align(Alignment.BottomCenter)) { contentBottom(Modifier) }
-            Box(Modifier.align(Alignment.CenterStart)) { contentLeft(Modifier) }
-            Box(Modifier.align(Alignment.CenterEnd)) { contentRight(Modifier) }
+            contentTop?.let { Box(Modifier.align(Alignment.TopCenter)) { it(Modifier) } }
+            contentBottom?.let { Box(Modifier.align(Alignment.BottomCenter)) { it(Modifier) } }
+            contentLeft?.let { Box(Modifier.align(Alignment.CenterStart)) { it(Modifier) } }
+            contentRight?.let { Box(Modifier.align(Alignment.CenterEnd)) { it(Modifier) } }
         }
     } else {
         Column(
             modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(panelSpacing)
+            verticalArrangement = if (contentTop != null || contentBottom != null) {
+                Arrangement.spacedBy(panelSpacing)
+            } else Arrangement.Top
         ) {
-            contentTop(Modifier)
+            contentTop?.invoke(Modifier)
             Row(
                 modifier = Modifier
-                    .weight(1f, fill = false)
+                    .weight(1f, fill = expandLayout)
                     .wrapContentHeight(),
-                horizontalArrangement = Arrangement.spacedBy(panelSpacing),
+                horizontalArrangement = if (contentLeft != null || contentRight != null) {
+                    Arrangement.spacedBy(panelSpacing)
+                } else Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                contentLeft(Modifier)
+                contentLeft?.invoke(Modifier)
                 Box(
                     modifier = Modifier
-                        .weight(1f, fill = false)
+                        .weight(1f, fill = expandLayout)
                         .wrapContentWidth()
                 ) {
                     content(PaddingValues(0.dp))
                 }
-                contentRight(Modifier)
+                contentRight?.invoke(Modifier)
             }
-            contentBottom(Modifier)
+            contentBottom?.invoke(Modifier)
         }
     }
 }

@@ -8,84 +8,70 @@
  * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package br.com.arml.composecollections.collections.layout.list
+package br.com.arml.composecollections.collections.layout
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import br.com.arml.composecollections.R
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
-import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
+import br.com.arml.composecollections.collections.layout.list.CollectionPagedList
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class CollectionPagedListTest {
+class CollectionSlotTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private lateinit var upButtonTag: String
-    private lateinit var downButtonTag: String
+    private lateinit var defaultButtonTag: String
 
     @Before
     fun setup() {
         InstrumentationRegistry.getInstrumentation().targetContext.apply {
-            upButtonTag = getString(R.string.pagedQuickNavList_upButton_testTag)
-            downButtonTag = getString(R.string.pagedQuickNavList_downButton_testTag)
+            defaultButtonTag = getString(R.string.pagedQuickNavList_downButton_testTag)
         }
     }
 
     @Test
-    fun pagedList_vertical_shouldNavigateByPages() {
-        val state = LazyListState()
+    fun collectionPagedList_withCustomSlot_shouldRenderCustomControl_evenIfAlignmentIsNone() {
         composeTestRule.setContent {
             CollectionPagedList(
-                listState = state,
-                layoutSpec = CollectionLayoutSpec.Vertical(),
-                navigationAlignment = CollectionAlignment.Bottom
+                navigationAlignment = CollectionAlignment.None,
+                forwardControl = { _ ->
+                    Text("Custom Forward Control")
+                }
             ) {
-                items(100) { Text("Item $it", modifier = Modifier.fillMaxWidth()) }
+                items(100) { Text("Item $it") }
             }
         }
 
-        composeTestRule.onNodeWithTag(downButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex > 0)
-
-        composeTestRule.onNodeWithTag(upButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex == 0)
+        composeTestRule.onNodeWithText("Custom Forward Control").assertIsDisplayed()
+        // Default button should NOT exist
+        composeTestRule.onNodeWithTag(defaultButtonTag).assertDoesNotExist()
     }
 
     @Test
-    fun pagedList_horizontal_shouldNavigateByPages() {
-        val state = LazyListState()
+    fun collectionPagedList_withCustomSlot_shouldOverrideDefaultButton() {
         composeTestRule.setContent {
             CollectionPagedList(
-                listState = state,
-                layoutSpec = CollectionLayoutSpec.Horizontal(),
-                navigationAlignment = CollectionAlignment.End
+                navigationAlignment = CollectionAlignment.Bottom, // Would normally show default buttons
+                forwardControl = { _ ->
+                    Text("I Win")
+                }
             ) {
-                items(100) { Text("Item $it", modifier = Modifier.width(200.dp)) }
+                items(100) { Text("Item $it") }
             }
         }
 
-        composeTestRule.onNodeWithTag(downButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex > 0)
-
-        composeTestRule.onNodeWithTag(upButtonTag).performClick()
-        composeTestRule.waitForIdle()
-        assert(state.firstVisibleItemIndex == 0)
+        composeTestRule.onNodeWithText("I Win").assertIsDisplayed()
+        // The default "Next" button should be hidden by the custom slot
+        composeTestRule.onNodeWithTag(defaultButtonTag).assertDoesNotExist()
     }
 }

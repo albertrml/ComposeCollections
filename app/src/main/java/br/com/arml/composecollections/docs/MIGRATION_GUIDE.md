@@ -2,37 +2,34 @@
 
 This guide helps you update your project as the library evolves.
 
-## v0.2.6 to v0.2.7: Rebranding (Breaking Change)
+## v0.2.7 to v0.2.8: The Slot Era & Architectural Consolidation (Current)
 
-In version 0.2.7, the library transitioned from a utility focused on "Quick Navigation" to a comprehensive "Collection Containers" framework.
+Version 0.2.8 focuses on flexibility, semantic consistency, and a cleaner architecture.
 
-### 1. Package Renaming
+### 1. Unified Slot API (Breaking Change)
+We have renamed the slot parameters to align with our directional navigation API.
 
-- **Old**: `br.com.arml.composecollections.scrollables.*`
-- **New**: `br.com.arml.composecollections.collections.*`
+- **Old**: `leadingControl` / `trailingControl` (from beta v0.2.8)
+- **New**: **`backwardControl`** / **`forwardControl`**
+- **Action**: Update your parameter names when injecting custom UI.
 
-### 2. Component Renaming
+### 2. Opt-in Navigation (Breaking Change)
+To make the library a safe drop-in replacement for native `Lazy` components, navigation is now **disabled by default**.
 
-All components and classes starting with `QuickNav` have been renamed to `Collection`.
+- **Old**: Buttons showed automatically (`navigationAlignment` was `Bottom`).
+- **New**: `navigationAlignment` now defaults to **`None`**.
+- **Action**: Explicitly set `navigationAlignment = CollectionAlignment.Bottom` (or any other alignment) if you want to see the default buttons.
 
-| Old Name | New Name |
-| :--- | :--- |
-| `QuickNavScaffold` | `CollectionScaffold` |
-| `QuickNavState` | `CollectionState` |
-| `QuickNavTheme` | `CollectionTheme` |
-| `PagedList` | `CollectionPagedList` |
-| `EdgedGrid` | `CollectionEdgedGrid` |
-| ... | ... |
+### 3. Layout Control (`expandLayout`)
+You can now control if the container should "tightly" wrap your list or stretch to fill the available space.
 
-### 3. Cleanup of Legacy Methods
+- **`false` (Default)**: Container wraps content (prevents white space).
+- **`true`**: Container stretches (pushes buttons to the edges of the screen).
 
-All methods marked as `@Deprecated` in v0.2.3 and v0.2.6 (like `animateScrollToStart`, `animateScrollToNextPage`) have been **removed**. Use the unified direction-based API:
-- `animateScrollToBackward()`
-- `animateScrollToForward()`
+### 4. Semantic Animation Integration
+The `animationMode` parameter is now fully connected. Changing it to `Snap` or `Elastic` will automatically configure the internal `collectionState` with the correct physics.
 
 ---
 
-## Older Migrations (Reference)
-
-### v0.1.x to v0.2.0: Structural Improvements
-... (previous content)
+## v0.2.6 to v0.2.7: Rebranding
+... (previous history)

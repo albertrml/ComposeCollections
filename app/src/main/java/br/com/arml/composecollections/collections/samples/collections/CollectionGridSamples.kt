@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
 import br.com.arml.composecollections.collections.layout.grid.CollectionEdgedGrid
 import br.com.arml.composecollections.collections.layout.grid.CollectionPagedGrid
@@ -48,7 +49,8 @@ fun VerticalEdgedGridSample() {
         Surface(Modifier.fillMaxSize()) {
             CollectionEdgedGrid(
                 cells = GridCells.Fixed(3),
-                layoutSpec = CollectionLayoutSpec.Vertical()
+                layoutSpec = CollectionLayoutSpec.Vertical(),
+                navigationAlignment = CollectionAlignment.End
             ) {
                 items(100) { GridItem(it) }
             }
@@ -63,7 +65,8 @@ fun VerticalPagedGridSample() {
         Surface(Modifier.fillMaxSize()) {
             CollectionPagedGrid(
                 cells = GridCells.Adaptive(100.dp),
-                layoutSpec = CollectionLayoutSpec.Vertical()
+                layoutSpec = CollectionLayoutSpec.Vertical(),
+                navigationAlignment = CollectionAlignment.Bottom
             ) {
                 items(100) { GridItem(it) }
             }
@@ -78,7 +81,8 @@ fun HorizontalEdgedGridSample() {
         Surface(Modifier.fillMaxSize()) {
             CollectionEdgedGrid(
                 cells = GridCells.Fixed(4),
-                layoutSpec = CollectionLayoutSpec.Horizontal()
+                layoutSpec = CollectionLayoutSpec.Horizontal(),
+                navigationAlignment = CollectionAlignment.End
             ) {
                 items(100) { GridItem(it) }
             }
@@ -93,7 +97,8 @@ fun HorizontalPagedGridSample() {
         Surface(Modifier.fillMaxSize()) {
             CollectionPagedGrid(
                 cells = GridCells.Fixed(3),
-                layoutSpec = CollectionLayoutSpec.Horizontal()
+                layoutSpec = CollectionLayoutSpec.Horizontal(),
+                navigationAlignment = CollectionAlignment.Bottom
             ) {
                 items(100) { GridItem(it) }
             }
