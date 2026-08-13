@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import br.com.arml.composecollections.app.samples.AdvancedTelemetrySample
 import br.com.arml.composecollections.app.samples.CustomControlSample
 import br.com.arml.composecollections.app.samples.ElasticScrollSample
 import br.com.arml.composecollections.app.samples.GridStickyHeaderSample
@@ -85,7 +86,8 @@ enum class Screen {
     SnapScroll,
     KeyboardInput,
     ThemedSample,
-    CustomControl
+    CustomControl,
+    AdvancedTelemetry
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,6 +146,7 @@ fun GalleryApp() {
                     Screen.KeyboardInput -> KeyboardNavigationSample()
                     Screen.ThemedSample -> ThemedNavigationSample()
                     Screen.CustomControl -> CustomControlSample()
+                    Screen.AdvancedTelemetry -> AdvancedTelemetrySample()
                 }
             }
         }
@@ -191,6 +194,7 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
         item { CategoryHeader("Customization") }
         items(listOf(
             "Scroll Indicators" to Screen.ListWithIndicator,
+            "Advanced Telemetry" to Screen.AdvancedTelemetry,
             "Custom Labels & Icons" to Screen.ThemedSample,
             "Custom Control (FAB)" to Screen.CustomControl
         )) { (label, screen) ->

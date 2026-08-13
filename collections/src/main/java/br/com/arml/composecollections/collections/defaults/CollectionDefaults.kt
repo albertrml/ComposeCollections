@@ -23,12 +23,12 @@ object CollectionDefaults {
     /**
      * Default layout expansion policy.
      */
-    const val ExpandLayout = false
+    const val expandLayout = false
 
     /**
      * Test tag for the main collection component.
      */
-    const val ComponentTestTag = "CollectionComponent"
+    const val componentTestTag = "CollectionComponent"
 
     /**
      * Internal factory to create the default navigation UI.

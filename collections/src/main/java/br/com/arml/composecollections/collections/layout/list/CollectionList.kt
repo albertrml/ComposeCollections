@@ -19,21 +19,17 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import br.com.arml.composecollections.collections.components.indicators.CollectionLinearIndicator
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionAnimationMode
 import br.com.arml.composecollections.collections.defaults.CollectionDefaults
-import br.com.arml.composecollections.collections.defaults.CollectionDimensionDefaults
-import br.com.arml.composecollections.collections.defaults.CollectionDimensions
-import br.com.arml.composecollections.collections.defaults.CollectionIconDefaults
-import br.com.arml.composecollections.collections.defaults.CollectionIcons
-import br.com.arml.composecollections.collections.defaults.CollectionLabelDefaults
-import br.com.arml.composecollections.collections.defaults.CollectionLabels
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
 import br.com.arml.composecollections.collections.defaults.CollectionMode
-import br.com.arml.composecollections.collections.defaults.LocalCollectionLabels
-import br.com.arml.composecollections.collections.components.CollectionLinearIndicator
+import br.com.arml.composecollections.collections.defaults.CollectionUIState
+import br.com.arml.composecollections.collections.defaults.rememberCollectionUIState
 import br.com.arml.composecollections.collections.layout.foundation.CollectionScaffold
+import br.com.arml.composecollections.collections.state.CollectionListState
 import br.com.arml.composecollections.collections.state.CollectionState
 import br.com.arml.composecollections.collections.state.rememberCollectionListState
 
@@ -42,19 +38,14 @@ import br.com.arml.composecollections.collections.state.rememberCollectionListSt
  */
 @Composable
 fun CollectionList(
+    state: CollectionListState,
     modifier: Modifier = Modifier,
-    listState: LazyListState = rememberLazyListState(),
-    mode: CollectionMode = CollectionMode.Paged,
-    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
-    collectionState: CollectionState = rememberCollectionListState(listState, mode, animationMode),
     layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
     navigationAlignment: CollectionAlignment = CollectionAlignment.None,
     isOverlay: Boolean = false,
     showIndicator: Boolean = false,
-    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
-    labels: CollectionLabels = LocalCollectionLabels.current ?: CollectionLabelDefaults.defaultLabels(mode),
-    icons: CollectionIcons = CollectionIconDefaults.default,
-    dimens: CollectionDimensions = CollectionDimensionDefaults.default,
+    expandLayout: Boolean = CollectionDefaults.expandLayout,
+    uiState: CollectionUIState = rememberCollectionUIState(state.mode),
     backwardControl: @Composable ((CollectionState) -> Unit)? = null,
     forwardControl: @Composable ((CollectionState) -> Unit)? = null,
     content: LazyListScope.() -> Unit,
@@ -62,13 +53,13 @@ fun CollectionList(
     val isHorizontal = layoutSpec is CollectionLayoutSpec.Horizontal
 
     CollectionScaffold(
-        modifier = modifier.testTag(CollectionDefaults.ComponentTestTag),
+        modifier = modifier.testTag(CollectionDefaults.componentTestTag),
         isOverlay = isOverlay,
         navigationAlignment = navigationAlignment,
-        labels = labels,
-        icons = icons,
-        dimens = dimens,
-        collectionState = collectionState,
+        labels = uiState.labels,
+        icons = uiState.icons,
+        dimens = uiState.dimensions,
+        collectionState = state,
         isHorizontal = isHorizontal,
         expandLayout = expandLayout,
         backwardControl = backwardControl,
@@ -76,7 +67,7 @@ fun CollectionList(
         indicator = {
             if (showIndicator) {
                 CollectionLinearIndicator(
-                    progress = collectionState.scrollProgress,
+                    progress = state.scrollProgress,
                     isHorizontal = isHorizontal
                 )
             }
@@ -85,7 +76,7 @@ fun CollectionList(
         when (layoutSpec) {
             is CollectionLayoutSpec.Vertical -> LazyColumn(
                 modifier = containerModifier.fillMaxWidth(),
-                state = listState,
+                state = state.listState,
                 verticalArrangement = layoutSpec.arrangement,
                 horizontalAlignment = layoutSpec.alignment,
                 content = content
@@ -93,7 +84,7 @@ fun CollectionList(
 
             is CollectionLayoutSpec.Horizontal -> LazyRow(
                 modifier = containerModifier.fillMaxWidth(),
-                state = listState,
+                state = state.listState,
                 horizontalArrangement = layoutSpec.arrangement,
                 verticalAlignment = layoutSpec.alignment,
                 content = content
@@ -114,24 +105,25 @@ fun CollectionPagedList(
     navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
     isOverlay: Boolean = false,
     showIndicator: Boolean = false,
-    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
+    expandLayout: Boolean = CollectionDefaults.expandLayout,
     backwardControl: @Composable ((CollectionState) -> Unit)? = null,
     forwardControl: @Composable ((CollectionState) -> Unit)? = null,
     content: LazyListScope.() -> Unit
-) = CollectionList(
-    modifier = modifier,
-    listState = listState,
-    mode = CollectionMode.Paged,
-    animationMode = animationMode,
-    layoutSpec = layoutSpec,
-    navigationAlignment = navigationAlignment,
-    isOverlay = isOverlay,
-    showIndicator = showIndicator,
-    expandLayout = expandLayout,
-    backwardControl = backwardControl,
-    forwardControl = forwardControl,
-    content = content
-)
+) {
+    val state = rememberCollectionListState(listState, CollectionMode.Paged, animationMode)
+    CollectionList(
+        state = state,
+        modifier = modifier,
+        layoutSpec = layoutSpec,
+        navigationAlignment = navigationAlignment,
+        isOverlay = isOverlay,
+        showIndicator = showIndicator,
+        expandLayout = expandLayout,
+        backwardControl = backwardControl,
+        forwardControl = forwardControl,
+        content = content
+    )
+}
 
 /**
  * A specialized list that provides controls to jump directly to extremes.
@@ -145,21 +137,22 @@ fun CollectionEdgedList(
     navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
     isOverlay: Boolean = false,
     showIndicator: Boolean = false,
-    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
+    expandLayout: Boolean = CollectionDefaults.expandLayout,
     backwardControl: @Composable ((CollectionState) -> Unit)? = null,
     forwardControl: @Composable ((CollectionState) -> Unit)? = null,
     content: LazyListScope.() -> Unit
-) = CollectionList(
-    modifier = modifier,
-    listState = listState,
-    mode = CollectionMode.Edged,
-    animationMode = animationMode,
-    layoutSpec = layoutSpec,
-    navigationAlignment = navigationAlignment,
-    isOverlay = isOverlay,
-    showIndicator = showIndicator,
-    expandLayout = expandLayout,
-    backwardControl = backwardControl,
-    forwardControl = forwardControl,
-    content = content
-)
+) {
+    val state = rememberCollectionListState(listState, CollectionMode.Edged, animationMode)
+    CollectionList(
+        state = state,
+        modifier = modifier,
+        layoutSpec = layoutSpec,
+        navigationAlignment = navigationAlignment,
+        isOverlay = isOverlay,
+        showIndicator = showIndicator,
+        expandLayout = expandLayout,
+        backwardControl = backwardControl,
+        forwardControl = forwardControl,
+        content = content
+    )
+}

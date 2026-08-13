@@ -31,7 +31,7 @@ class CollectionLayoutTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val componentTag = CollectionDefaults.ComponentTestTag
+    private val componentTag = CollectionDefaults.componentTestTag
 
     @Test
     fun collectionPagedList_withExpandLayoutFalse_shouldWrapHeight() {

@@ -25,10 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import br.com.arml.composecollections.collections.components.indicators.CollectionLinearIndicator
 import br.com.arml.composecollections.collections.defaults.CollectionDimensionDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionIconDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionLabelDefaults
-import br.com.arml.composecollections.collections.components.CollectionLinearIndicator
 import br.com.arml.composecollections.collections.layout.foundation.CollectionScaffold
 import br.com.arml.composecollections.collections.state.CollectionState
 

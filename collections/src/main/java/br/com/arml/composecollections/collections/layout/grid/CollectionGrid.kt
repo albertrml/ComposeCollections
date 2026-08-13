@@ -24,25 +24,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import br.com.arml.composecollections.collections.components.indicators.CollectionLinearIndicator
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionAnimationMode
 import br.com.arml.composecollections.collections.defaults.CollectionDefaults
-import br.com.arml.composecollections.collections.defaults.CollectionDimensionDefaults
-import br.com.arml.composecollections.collections.defaults.CollectionDimensions
-import br.com.arml.composecollections.collections.defaults.CollectionIconDefaults
-import br.com.arml.composecollections.collections.defaults.CollectionIcons
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
-import br.com.arml.composecollections.collections.defaults.CollectionLabelDefaults
-import br.com.arml.composecollections.collections.defaults.CollectionLabels
 import br.com.arml.composecollections.collections.defaults.CollectionMode
 import br.com.arml.composecollections.collections.defaults.CollectionTheme
-import br.com.arml.composecollections.collections.defaults.LocalCollectionLabels
-import br.com.arml.composecollections.collections.components.CollectionLinearIndicator
+import br.com.arml.composecollections.collections.defaults.CollectionUIState
+import br.com.arml.composecollections.collections.defaults.rememberCollectionUIState
 import br.com.arml.composecollections.collections.layout.foundation.CollectionScaffold
 import br.com.arml.composecollections.collections.layout.grid.scope.CollectionGridScope
 import br.com.arml.composecollections.collections.layout.grid.scope.CollectionGridScopeImpl
 import br.com.arml.composecollections.collections.layout.grid.scope.renderCollectionItems
+import br.com.arml.composecollections.collections.state.CollectionGridState
 import br.com.arml.composecollections.collections.state.CollectionState
 import br.com.arml.composecollections.collections.state.rememberCollectionGridState
 
@@ -52,19 +48,14 @@ import br.com.arml.composecollections.collections.state.rememberCollectionGridSt
 @Composable
 fun CollectionGrid(
     cells: GridCells,
+    state: CollectionGridState,
     modifier: Modifier = Modifier,
-    gridState: LazyGridState = rememberLazyGridState(),
-    mode: CollectionMode = CollectionMode.Paged,
-    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
-    collectionState: CollectionState = rememberCollectionGridState(gridState, mode, animationMode),
     layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
     navigationAlignment: CollectionAlignment = CollectionAlignment.None,
     isOverlay: Boolean = false,
     showIndicator: Boolean = false,
-    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
-    labels: CollectionLabels = LocalCollectionLabels.current ?: CollectionLabelDefaults.defaultLabels(mode),
-    icons: CollectionIcons = CollectionIconDefaults.default,
-    dimens: CollectionDimensions = CollectionDimensionDefaults.default,
+    expandLayout: Boolean = CollectionDefaults.expandLayout,
+    uiState: CollectionUIState = rememberCollectionUIState(state.mode),
     backwardControl: @Composable ((CollectionState) -> Unit)? = null,
     forwardControl: @Composable ((CollectionState) -> Unit)? = null,
     content: CollectionGridScope.() -> Unit
@@ -74,18 +65,18 @@ fun CollectionGrid(
 
     val currentHeaderIndex by remember {
         derivedStateOf {
-            gridScope.headerIndexes.lastOrNull { it <= gridState.firstVisibleItemIndex }
+            gridScope.headerIndexes.lastOrNull { it <= state.gridState.firstVisibleItemIndex }
         }
     }
 
     CollectionScaffold(
-        modifier = modifier.testTag(CollectionDefaults.ComponentTestTag),
+        modifier = modifier.testTag(CollectionDefaults.componentTestTag),
         isOverlay = isOverlay,
         navigationAlignment = navigationAlignment,
-        labels = labels,
-        icons = icons,
-        dimens = dimens,
-        collectionState = collectionState,
+        labels = uiState.labels,
+        icons = uiState.icons,
+        dimens = uiState.dimensions,
+        collectionState = state,
         isHorizontal = isHorizontal,
         expandLayout = expandLayout,
         backwardControl = backwardControl,
@@ -93,7 +84,7 @@ fun CollectionGrid(
         indicator = {
             if (showIndicator) {
                 CollectionLinearIndicator(
-                    progress = collectionState.scrollProgress,
+                    progress = state.scrollProgress,
                     isHorizontal = isHorizontal
                 )
             }
@@ -111,7 +102,7 @@ fun CollectionGrid(
                 is CollectionLayoutSpec.Vertical -> LazyVerticalGrid(
                     columns = cells,
                     modifier = containerModifier.fillMaxWidth(),
-                    state = gridState,
+                    state = state.gridState,
                     verticalArrangement = layoutSpec.arrangement,
                     horizontalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
                 ) {
@@ -121,7 +112,7 @@ fun CollectionGrid(
                 is CollectionLayoutSpec.Horizontal -> LazyHorizontalGrid(
                     rows = cells,
                     modifier = containerModifier.fillMaxWidth(),
-                    state = gridState,
+                    state = state.gridState,
                     horizontalArrangement = layoutSpec.arrangement,
                     verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
                 ) {
@@ -145,25 +136,26 @@ fun CollectionPagedGrid(
     navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
     isOverlay: Boolean = false,
     showIndicator: Boolean = false,
-    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
+    expandLayout: Boolean = CollectionDefaults.expandLayout,
     backwardControl: @Composable ((CollectionState) -> Unit)? = null,
     forwardControl: @Composable ((CollectionState) -> Unit)? = null,
     content: CollectionGridScope.() -> Unit
-) = CollectionGrid(
-    cells = cells,
-    modifier = modifier,
-    gridState = gridState,
-    mode = CollectionMode.Paged,
-    animationMode = animationMode,
-    layoutSpec = layoutSpec,
-    navigationAlignment = navigationAlignment,
-    isOverlay = isOverlay,
-    showIndicator = showIndicator,
-    expandLayout = expandLayout,
-    backwardControl = backwardControl,
-    forwardControl = forwardControl,
-    content = content
-)
+) {
+    val state = rememberCollectionGridState(gridState, CollectionMode.Paged, animationMode)
+    CollectionGrid(
+        cells = cells,
+        state = state,
+        modifier = modifier,
+        layoutSpec = layoutSpec,
+        navigationAlignment = navigationAlignment,
+        isOverlay = isOverlay,
+        showIndicator = showIndicator,
+        expandLayout = expandLayout,
+        backwardControl = backwardControl,
+        forwardControl = forwardControl,
+        content = content
+    )
+}
 
 /**
  * A specialized grid that provides jump-to-extreme controls.
@@ -178,22 +170,23 @@ fun CollectionEdgedGrid(
     navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
     isOverlay: Boolean = false,
     showIndicator: Boolean = false,
-    expandLayout: Boolean = CollectionDefaults.ExpandLayout,
+    expandLayout: Boolean = CollectionDefaults.expandLayout,
     backwardControl: @Composable ((CollectionState) -> Unit)? = null,
     forwardControl: @Composable ((CollectionState) -> Unit)? = null,
     content: CollectionGridScope.() -> Unit
-) = CollectionGrid(
-    cells = cells,
-    modifier = modifier,
-    gridState = gridState,
-    mode = CollectionMode.Edged,
-    animationMode = animationMode,
-    layoutSpec = layoutSpec,
-    navigationAlignment = navigationAlignment,
-    isOverlay = isOverlay,
-    showIndicator = showIndicator,
-    expandLayout = expandLayout,
-    backwardControl = backwardControl,
-    forwardControl = forwardControl,
-    content = content
-)
+) {
+    val state = rememberCollectionGridState(gridState, CollectionMode.Edged, animationMode)
+    CollectionGrid(
+        cells = cells,
+        state = state,
+        modifier = modifier,
+        layoutSpec = layoutSpec,
+        navigationAlignment = navigationAlignment,
+        isOverlay = isOverlay,
+        showIndicator = showIndicator,
+        expandLayout = expandLayout,
+        backwardControl = backwardControl,
+        forwardControl = forwardControl,
+        content = content
+    )
+}

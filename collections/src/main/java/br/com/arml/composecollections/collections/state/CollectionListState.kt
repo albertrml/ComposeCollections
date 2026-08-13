@@ -23,6 +23,8 @@ import br.com.arml.composecollections.collections.defaults.CollectionMode
 import br.com.arml.composecollections.collections.defaults.getCollectionAnimation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 /**
  * State object for Collection List components.
@@ -30,12 +32,14 @@ import kotlinx.coroutines.launch
 @Stable
 open class CollectionListState(
     val listState: LazyListState,
-    val mode: CollectionMode = CollectionMode.Edged,
-    val animationSpec: AnimationSpec<Float>? = null
+    override val mode: CollectionMode = CollectionMode.Edged,
+    override val animationSpec: AnimationSpec<Float>? = null
 ) : CollectionState {
 
+    override val isScrolling by derivedStateOf { listState.isScrollInProgress }
+
     override val showScrollToBackward by derivedStateOf {
-        listState.firstVisibleItemIndex > 0
+        listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 0
     }
 
     override val showScrollToForward by derivedStateOf {
@@ -49,13 +53,53 @@ open class CollectionListState(
     override val scrollProgress: Float by derivedStateOf {
         val layoutInfo = listState.layoutInfo
         val totalItems = layoutInfo.totalItemsCount
-        val visibleItems = layoutInfo.visibleItemsInfo.size
+        if (totalItems == 0) return@derivedStateOf 0f
+
+        val visibleItems = layoutInfo.visibleItemsInfo
+        if (visibleItems.isEmpty()) return@derivedStateOf 0f
+
+        val firstVisible = visibleItems.first()
+        val lastVisible = visibleItems.last()
         
-        if (totalItems <= visibleItems) {
-            0f
-        } else {
-            listState.firstVisibleItemIndex.toFloat() / (totalItems - visibleItems)
-        }
+        val viewportSize = layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset
+        val totalMeasuredSize = lastVisible.offset + lastVisible.size - firstVisible.offset
+        val estimatedTotalSize = (totalMeasuredSize.toFloat() / visibleItems.size) * totalItems
+        val scrolledPixels = (firstVisible.index * (totalMeasuredSize / visibleItems.size)) + listState.firstVisibleItemScrollOffset
+        
+        val progress = scrolledPixels.toFloat() / (estimatedTotalSize - viewportSize)
+        progress.coerceIn(0f, 1f)
+    }
+
+    override val currentPage: Int by derivedStateOf {
+        val total = totalPages
+        if (total <= 1) return@derivedStateOf 1
+
+        // Use scroll progress to interpolate for a smooth and accurate page count.
+        // We apply a small threshold to ensure it reaches the last page at the physical end.
+        val progress = if (scrollProgress > 0.99f) 1f else scrollProgress
+        (progress * (total - 1)).roundToInt() + 1
+    }
+
+    override val totalPages: Int by derivedStateOf {
+        val layoutInfo = listState.layoutInfo
+        val totalItems = layoutInfo.totalItemsCount
+        if (totalItems == 0) return@derivedStateOf 1
+        val visibleItems = layoutInfo.visibleItemsInfo
+        if (visibleItems.isEmpty()) return@derivedStateOf 1
+
+        val firstVisible = visibleItems.first()
+        val lastVisible = visibleItems.last()
+        val viewportSize = layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset
+
+        // Distance from start of first visible to end of last visible
+        val totalMeasuredSize = lastVisible.offset + lastVisible.size - firstVisible.offset
+        if (totalMeasuredSize <= 0) return@derivedStateOf 1
+
+        // Use the actual index span to account for all items in the measured range
+        val indexSpan = (lastVisible.index - firstVisible.index + 1).toDouble()
+        val itemsPerPage = (indexSpan / totalMeasuredSize) * viewportSize
+
+        ceil((totalItems.toDouble() / itemsPerPage) - 0.001).toInt().coerceAtLeast(1)
     }
 
     override fun animateScrollToBackward(scope: CoroutineScope) = scope.launch {

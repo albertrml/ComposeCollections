@@ -10,47 +10,74 @@
 
 package br.com.arml.composecollections.collections.state
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.runtime.Stable
+import br.com.arml.composecollections.collections.defaults.CollectionMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 
 /**
- * An interface defining the contract for navigation state within Collection components.
+ * Interface defining the logical state and telemetry of a collection container.
  */
 @Stable
 interface CollectionState {
     /**
-     * Whether the "Backward" (Up/Start/Previous) navigation button should be displayed.
+     * The active navigation mode ([CollectionMode.Paged] or [CollectionMode.Edged]).
+     */
+    val mode: CollectionMode
+
+    /**
+     * Custom animation for programmatic scrolls.
+     */
+    val animationSpec: AnimationSpec<Float>?
+
+    /**
+     * Whether the collection is currently being scrolled.
+     */
+    val isScrolling: Boolean
+
+    /**
+     * Whether to show the button to scroll to a backward position.
      */
     val showScrollToBackward: Boolean
 
     /**
-     * Whether the "Forward" (Down/End/Next) navigation button should be displayed.
+     * Whether to show the button to scroll to a forward position.
      */
     val showScrollToForward: Boolean
 
     /**
-     * The current scroll progress as a percentage from 0.0 to 1.0.
+     * High-precision scroll progress from 0.0 (start) to 1.0 (end).
      */
     val scrollProgress: Float
 
     /**
-     * Smoothly scrolls in the backward direction (e.g., towards the start or previous page).
+     * The current page index (1-based).
+     */
+    val currentPage: Int
+
+    /**
+     * Estimated total number of pages based on viewport size.
+     */
+    val totalPages: Int
+
+    /**
+     * Navigates backward based on [mode].
      */
     fun animateScrollToBackward(scope: CoroutineScope): Job
 
     /**
-     * Smoothly scrolls in the forward direction (e.g., towards the end or next page).
+     * Navigates forward based on [mode].
      */
     fun animateScrollToForward(scope: CoroutineScope): Job
 
     /**
-     * Smoothly scrolls to the absolute start of the collection.
+     * Directly navigates to the absolute start of the collection.
      */
     fun animateScrollToStart(scope: CoroutineScope): Job
 
     /**
-     * Smoothly scrolls to the absolute end of the collection.
+     * Directly navigates to the absolute end of the collection.
      */
     fun animateScrollToEnd(scope: CoroutineScope): Job
 }

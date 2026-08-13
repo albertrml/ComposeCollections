@@ -13,6 +13,8 @@ package br.com.arml.composecollections.app.samples
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -20,7 +22,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +61,22 @@ fun CustomControlSample() {
                 },
                 forwardControl = {}
             ) {
-                items(100) { ListItem(it) }
+                items(100) { index ->
+                    // Random heights to demonstrate estimation behavior
+                    val height = remember(index) { (80..250).random().dp }
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(height)
+                            .padding(8.dp),
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text("Item #$index (${height.value.toInt()}dp)")
+                        }
+                    }
+                }
             }
         }
     }

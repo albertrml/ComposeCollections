@@ -61,10 +61,9 @@ fun CollectionScrollButton(
             icon = icon,
             iconContentDescription = contentDescription,
             onClick = {
-                if (direction == ScrollDirection.Backward) {
-                    state.animateScrollToBackward(scope)
-                } else {
-                    state.animateScrollToForward(scope)
+                when(direction){
+                    ScrollDirection.Backward -> state.animateScrollToBackward(scope)
+                    ScrollDirection.Forward -> state.animateScrollToForward(scope)
                 }
             }
         )

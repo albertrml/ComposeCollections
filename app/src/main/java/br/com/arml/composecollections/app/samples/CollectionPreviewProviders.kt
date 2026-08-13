@@ -10,16 +10,23 @@
 
 package br.com.arml.composecollections.app.samples
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import br.com.arml.composecollections.collections.defaults.CollectionMode
 import br.com.arml.composecollections.collections.state.CollectionState
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 
 internal class MockCollectionState(
+    override val mode: CollectionMode = CollectionMode.Paged,
+    override val animationSpec: AnimationSpec<Float>? = null,
+    override val isScrolling: Boolean = false,
     override val showScrollToBackward: Boolean = false,
     override val showScrollToForward: Boolean = false,
     override val scrollProgress: Float = 0f,
+    override val currentPage: Int = 1,
+    override val totalPages: Int = 1,
     val onAction: (() -> Unit)? = null
 ) : CollectionState {
     override fun animateScrollToBackward(scope: CoroutineScope): Job {
@@ -42,8 +49,26 @@ internal class MockCollectionState(
 
 internal class CollectionStateProvider : PreviewParameterProvider<CollectionState> {
     override val values = sequenceOf(
-        MockCollectionState(showScrollToBackward = false, showScrollToForward = true, scrollProgress = 0f),
-        MockCollectionState(showScrollToBackward = true, showScrollToForward = true, scrollProgress = 0.5f),
-        MockCollectionState(showScrollToBackward = true, showScrollToForward = false, scrollProgress = 1f)
+        MockCollectionState(
+            showScrollToBackward = false,
+            showScrollToForward = true,
+            scrollProgress = 0f,
+            currentPage = 1,
+            totalPages = 5
+        ),
+        MockCollectionState(
+            showScrollToBackward = true,
+            showScrollToForward = true,
+            scrollProgress = 0.5f,
+            currentPage = 3,
+            totalPages = 5
+        ),
+        MockCollectionState(
+            showScrollToBackward = true,
+            showScrollToForward = false,
+            scrollProgress = 1f,
+            currentPage = 5,
+            totalPages = 5
+        )
     )
 }

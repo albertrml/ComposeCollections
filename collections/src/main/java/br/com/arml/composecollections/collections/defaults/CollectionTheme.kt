@@ -17,9 +17,12 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -51,6 +54,25 @@ object CollectionTransitionDefaults {
         enter = CollectionVisibilityTransitions.fadeIn,
         exit = CollectionVisibilityTransitions.fadeOut
     )
+}
+
+@Immutable
+data class CollectionUIState(
+    val labels: CollectionLabels,
+    val icons: CollectionIcons,
+    val dimensions: CollectionDimensions
+)
+
+@Composable
+fun rememberCollectionUIState(
+    mode: CollectionMode,
+    labels: CollectionLabels = LocalCollectionLabels.current ?: CollectionLabelDefaults.defaultLabels(mode),
+    icons: CollectionIcons = LocalCollectionIcons.current,
+    dimens: CollectionDimensions = LocalCollectionDimensions.current
+): CollectionUIState {
+    return remember(labels, icons, dimens) {
+        CollectionUIState(labels, icons, dimens)
+    }
 }
 
 val LocalCollectionLabels = staticCompositionLocalOf<CollectionLabels?> { null }
@@ -91,4 +113,8 @@ object CollectionTheme {
     val dimensions: CollectionDimensions
         @Composable
         get() = LocalCollectionDimensions.current
+        
+    val colorScheme: ColorScheme
+        @Composable
+        get() = MaterialTheme.colorScheme
 }

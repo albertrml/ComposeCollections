@@ -20,6 +20,7 @@ import br.com.arml.composecollections.collections.R
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionMode
 import br.com.arml.composecollections.collections.layout.list.CollectionList
+import br.com.arml.composecollections.collections.state.rememberCollectionListState
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,8 +45,9 @@ class CollectionGeneralistTest {
     @Test
     fun collectionList_withPagedMode_shouldShowPagedButtons() {
         composeTestRule.setContent {
+            val state = rememberCollectionListState(mode = CollectionMode.Paged)
             CollectionList(
-                mode = CollectionMode.Paged,
+                state = state,
                 navigationAlignment = CollectionAlignment.Bottom
             ) {
                 items(100) { Text("Item $it") }
@@ -59,8 +61,9 @@ class CollectionGeneralistTest {
     @Test
     fun collectionList_withEdgedMode_shouldShowEdgedButtons() {
         composeTestRule.setContent {
+            val state = rememberCollectionListState(mode = CollectionMode.Edged)
             CollectionList(
-                mode = CollectionMode.Edged,
+                state = state,
                 navigationAlignment = CollectionAlignment.Bottom
             ) {
                 items(100) { Text("Item $it") }
@@ -74,7 +77,9 @@ class CollectionGeneralistTest {
     @Test
     fun collectionList_withNoneAlignment_shouldShowNoButtons() {
         composeTestRule.setContent {
+            val state = rememberCollectionListState()
             CollectionList(
+                state = state,
                 navigationAlignment = CollectionAlignment.None
             ) {
                 items(100) { Text("Item $it") }

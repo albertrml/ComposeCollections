@@ -39,7 +39,7 @@ class CollectionKeyboardTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val componentTag = CollectionDefaults.ComponentTestTag
+    private val componentTag = CollectionDefaults.componentTestTag
 
     @OptIn(ExperimentalTestApi::class)
     @Test

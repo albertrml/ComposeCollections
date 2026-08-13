@@ -1,10 +1,8 @@
-# API Blueprint & Technical Map (v0.2.9)
+# API Blueprint & Technical Map (v0.2.10)
 
-This document provides a comprehensive mapping of the `ComposeCollections` library, showing the relationships between its components, states, and its new **Multi-Module** architecture.
+This document provides a comprehensive mapping of the `ComposeCollections` library, showing the relationships between its components, states, and its **High-Precision Telemetry** system.
 
 ## 1. Project Structure (Multi-Module)
-
-Since v0.2.9, the project is divided into distinct modules to separate production code from demonstration and test samples.
 
 ```text
 ComposeCollections (Root)
@@ -26,11 +24,10 @@ graph TD
             Stag[CollectionStaggeredGrid]
         end
 
-        subgraph "Sugar Functions"
-            PList[CollectionPagedList]
-            EList[CollectionEdgedList]
-            PGrid[CollectionPagedGrid]
-            EGrid[CollectionEdgedGrid]
+        subgraph "Indicator Components"
+            Linear[CollectionLinearIndicator]
+            Scrollbar[CollectionScrollbar]
+            Counter[CollectionPageCounter]
         end
 
         subgraph "Internal Engine"
@@ -38,24 +35,19 @@ graph TD
             Layout[CollectionLayout]
         end
 
-        subgraph "State System"
+        subgraph "Telemetry System"
             StateI[CollectionState]
             StateList[CollectionListState]
         end
     end
 
-    subgraph ":app Module (Consumers)"
-        Gallery[MainActivity / GalleryApp]
-        Samples[Custom Samples / Showcase]
-    end
-
     %% Relationships
-    PList -- calls --> List
     List --> Scaffold
     Scaffold --> Layout
     
-    Gallery -- depends on --> List
-    Gallery -- depends on --> PList
+    Linear -- consumes --> StateI.scrollProgress
+    Scrollbar -- consumes --> StateI.isScrolling
+    Counter -- consumes --> StateI.currentPage
     
     Scaffold -- interacts via --> StateI
     StateList -- implements --> StateI
@@ -65,32 +57,37 @@ graph TD
 
 ## 3. Functional Matrix
 
-| Component | Paged Mode | Edged Mode | Custom Slots (Slot API) | Hardware Shortcuts | Sticky Headers | Layout Expansion |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **CollectionList** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **CollectionGrid** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **CollectionStaggeredGrid** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Component                   | Paged Mode | Edged Mode | Precision Telemetry | Modern Scrollbar | Page Counter | Hardware Shortcuts |
+|:----------------------------|:----------:|:----------:|:-------------------:|:----------------:|:------------:|:------------------:|
+| **CollectionList**          |     ✅      |     ✅      |   ✅ (Pixel-level)   |        ✅         |      ✅       |         ✅          |
+| **CollectionGrid**          |     ✅      |     ✅      |   ✅ (Pixel-level)   |        ✅         |      ✅       |         ✅          |
+| **CollectionStaggeredGrid** |     ✅      |     ✅      |   ✅ (Pixel-level)   |        ✅         |      ✅       |         ✅          |
 
 ---
 
-## 4. Package Taxonomy (inside :collections)
+## 4. Telemetry API (`CollectionState`)
 
-### `.collections.layout.list` / `.grid`
-- Consolidated files containing the generalist engine and specialist "Sugar Functions".
+Since v0.2.10, the library provides industrial-grade telemetry:
 
-### `.collections.layout.foundation`
-- `CollectionScaffold` manages **Slot API Sovereignty** and hardware key event mapping.
-
-### `.collections.state`
-- Behavioral logic and scroll control via **State Hoisting**.
-
-### `.collections.defaults`
-- Central source of truth for design tokens, animation specs, and default factories.
+- **`scrollProgress`**: Calculated based on cumulative pixel offsets, not item counts. Accurate for variable-sized items.
+- **`isScrolling`**: Reactive boolean to track movement (perfect for hiding/showing scrollbars).
+- **`currentPage` / `totalPages`**: Smart estimation based on average item size and viewport coverage.
 
 ---
 
-## 5. Slot API Priority & Sovereignty
+## 5. Indicator Sovereignty
 
-1.  **Direct Sovereignty**: `backwardControl` or `forwardControl` override everything.
-2.  **Configured Alignment**: Library renders defaults if `navigationAlignment` is set.
-3.  **Lite Execution**: `None` alignment + No controls = zero UI overhead (Standard `Lazy` behavior).
+The library provides three ways to visualize progress:
+
+1.  **Linear (Integrated)**: Enabled via `showIndicator = true`.
+2.  **Scrollbar (Modern)**: Discretely appears on the edge during movement.
+3.  **Counter (Textual)**: Floating "pill" showing the exact page location.
+
+---
+
+## 6. Extensibility Map
+
+1. **Total UI Override**: Use `backwardControl/forwardControl`.
+2. **Behavioral Switch**: Change `mode` between `Paged` and `Edged`.
+3. **Physical Feel**: Toggle `animationMode` (Default, Snap, Elastic).
+4. **Telemetry Visualization**: Inject any of the new `Indicator` components into custom slots or overlays.
