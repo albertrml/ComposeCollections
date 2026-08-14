@@ -1,10 +1,12 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     `maven-publish`
 }
 
-val libraryVersion = "0.2.0"
+val libraryVersion = "0.3.0"
 
 android {
     namespace = "br.com.arml.composecollections"
@@ -14,7 +16,7 @@ android {
         applicationId = "br.com.arml.composecollections"
         minSdk = 24
         targetSdk = 37
-        versionCode = 3
+        versionCode = 12
         versionName = libraryVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -42,6 +44,19 @@ android {
     }
 }
 
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+                    project.layout.buildDirectory.dir("compose_metrics").get().asFile.absolutePath,
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+                    project.layout.buildDirectory.dir("compose_metrics").get().asFile.absolutePath
+        )
+    }
+}
+
 dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
 
@@ -55,6 +70,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.ui.tooling.preview)
+
+    implementation(project(":collections"))
 
     testImplementation(libs.junit)
 

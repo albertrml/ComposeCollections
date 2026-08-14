@@ -3,20 +3,20 @@
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/albertrml/composecollections)
 ![License](https://img.shields.io/github/license/albertrml/composecollections)
 
-A biblioteca fornece componentes Compose para exibição de grandes coleções de dados com navegação rápida, indicadores de posição e comportamento consistente entre listas e containers roláveis.
+A biblioteca fornece componentes Compose avançados para exibição de coleções de dados, com navegação rápida, cabeçalhos fixos e comportamento consistente entre diferentes layouts.
 
 ## 🚀 Visão Geral
 
-O **ComposeCollections** foca em melhorar a experiência de navegação em listas longas no Jetpack Compose, oferecendo a API **QuickNav** que facilita o deslocamento rápido através de botões de ação inteligentes e transições suaves.
+O **ComposeCollections** evoluiu de uma ferramenta de navegação para um framework completo de **containers de coleção**. Ele oferece componentes que superam as limitações do Compose nativo, como suporte a Sticky Headers em Grids e navegação otimizada para TV/Hardware.
 
 ## ✨ Recursos
 
-*   **EdgedList & EdgedGrid**: Lazy containers aprimorados com botões para saltar diretamente para o **início** ou para o **fim**.
-*   **PagedList & PagedGrid**: Navegação por **páginas**, rolando exatamente a quantidade de itens visíveis na tela (viewport).
-*   **Suporte Horizontal & Vertical**: Todos os componentes suportam ambas as orientações via `QuickNavLayoutSpec`.
-*   **Modo Overlay**: Botões de navegação inteligentes que podem flutuar sobre o conteúdo ou ocupar espaços dedicados.
-*   **Customização Total**: Interface `QuickNavState` para lógicas de scroll próprias e `QuickNavTheme` para estilo global.
-*   **API Protegida**: Componentes de suporte internos estão ocultos para garantir uma superfície de API limpa e estável.
+*   **CollectionPagedList & Grid**: Navegação fluida por **páginas** (viewport), ideal para catálogos.
+*   **CollectionEdgedList & Grid**: Atalhos rápidos para saltar diretamente para o **início** ou **fim**.
+*   **Sticky Headers for Grids**: Suporte exclusivo para cabeçalhos fixos em grades e staggered grids.
+*   **Acessibilidade & Hardware**: Suporte nativo para teclados e D-pads (TV).
+*   **Industrial Performance**: Componentes 100% otimizados pelo compilador do Compose (Skippable).
+*   **Totalmente Customizável**: Sistema de temas completo e **Slot API** para injeção de controles customizados (ex: FABs).
 
 ## 📦 Instalação
 
@@ -44,7 +44,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    implementation("br.com.arml.composecollections:composecollections:0.2.0")
+    implementation("br.com.arml.composecollections:collections:0.3.0")
 }
 ```
 
@@ -52,53 +52,45 @@ dependencies {
 
 ### Lista Paginada (Vertical)
 ```kotlin
-import br.com.arml.composecollections.scrollables.layout.list.PagedList
+import br.com.arml.composecollections.collections.layout.list.CollectionPagedList
 
-PagedList(
-    layoutSpec = QuickNavLayoutSpec.Vertical(),
-    navigationAlignment = NavigationAlignment.Bottom
-) {
+CollectionPagedList {
     items(100) { item -> Text("Item $item") }
 }
 ```
 
-### Grade de Extremos (Horizontal Overlay)
+### Grade com Cabeçalhos Fixos
 ```kotlin
-import br.com.arml.composecollections.scrollables.layout.grid.EdgedGrid
+import br.com.arml.composecollections.collections.layout.grid.CollectionPagedGrid
 
-EdgedGrid(
-    columns = GridCells.Fixed(3),
-    layoutSpec = QuickNavLayoutSpec.Horizontal(),
-    isOverlay = true
-) {
-    items(100) { item -> Card { Text("Box $item") } }
+CollectionPagedGrid(cells = GridCells.Fixed(3)) {
+    stickyHeader { Text("Electronics") }
+    items(products) { ProductCard(it) }
 }
 ```
 
 ## 🎨 Customização e Temas
 
-Você pode customizar globalmente rótulos, ícones e animações usando o `QuickNavTheme`.
+Use o `CollectionTheme` para ajustar globalmente o visual e as medidas:
 
-### Tradução de Rótulos
 ```kotlin
-val customLabels = QuickNavLabels(
-    previousLabel = "Voltar",
-    nextLabel = "Avançar",
-    // ...
-)
-
-QuickNavTheme(labels = customLabels) {
-    EdgedList { /* ... */ }
+CollectionTheme(
+    labels = customLabels,
+    icons = customIcons,
+    dimens = CollectionDimensionDefaults.default.copy(itemSpacing = 16.dp)
+) {
+    CollectionPagedList { /* ... */ }
 }
 ```
 
 ## 📚 Documentação Detalhada
 
-Confira nossos guias:
-- [Arquitetura](app/src/main/java/br/com/arml/composecollections/docs/ARCHITECTURE.md)
-- [Customização e Estados](app/src/main/java/br/com/arml/composecollections/docs/CUSTOMIZATION.md)
-- [Guia de Migração (v0.1 para v0.2)](app/src/main/java/br/com/arml/composecollections/docs/MIGRATION_GUIDE.md)
-- [Primeiros Passos](app/src/main/java/br/com/arml/composecollections/docs/GETTING_STARTED.md)
+Confira nossos guias técnicos no módulo principal:
+- [Mapa da API e Arquitetura](collections/docs/API_MAP.md)
+- [Guia de Migração](collections/docs/MIGRATION_GUIDE.md)
+- [Métricas de Performance](collections/docs/COMPOSE_COMPILER_METRICS_GUIDE.md)
+- [Normas de Design de API](collections/docs/API_DESIGN_GUIDELINES.md)
+- [Arquitetura Interna](collections/docs/ARCHITECTURE.md)
 
 ## 🤝 Contribuição
 

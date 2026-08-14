@@ -25,8 +25,8 @@ jobs:
       - name: List gradle wrapper contents
         run: ls -la gradle/wrapper
 
-      - name: Publish package
-        run: ./gradlew publish
+      - name: Publish Library to GitHub Packages
+        run: ./gradlew :collections:publish
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

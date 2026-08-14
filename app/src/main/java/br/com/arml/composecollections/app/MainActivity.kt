@@ -39,8 +39,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import br.com.arml.composecollections.scrollables.samples.scrollables.*
+import br.com.arml.composecollections.app.samples.AdvancedTelemetrySample
+import br.com.arml.composecollections.app.samples.CustomControlSample
+import br.com.arml.composecollections.app.samples.ElasticScrollSample
+import br.com.arml.composecollections.app.samples.GridStickyHeaderSample
+import br.com.arml.composecollections.app.samples.HorizontalEdgedListSample
+import br.com.arml.composecollections.app.samples.HorizontalPagedGridSample
+import br.com.arml.composecollections.app.samples.HorizontalPagedListSample
+import br.com.arml.composecollections.app.samples.HorizontalStaggeredGridSample
+import br.com.arml.composecollections.app.samples.KeyboardNavigationSample
+import br.com.arml.composecollections.app.samples.ListWithIndicatorSample
+import br.com.arml.composecollections.app.samples.SnapScrollSample
+import br.com.arml.composecollections.app.samples.StickyHeaderListSample
+import br.com.arml.composecollections.app.samples.ThemedNavigationSample
+import br.com.arml.composecollections.app.samples.VerticalEdgedGridSample
+import br.com.arml.composecollections.app.samples.VerticalOverlayListSample
+import br.com.arml.composecollections.app.samples.VerticalPagedListSample
+import br.com.arml.composecollections.app.samples.VerticalStaggeredPinterestSample
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,13 +78,23 @@ enum class Screen {
     StickyHeaderList,
     VerticalEdgedGrid,
     HorizontalPagedGrid,
-    ThemedSample
+    VerticalStaggeredPinterest,
+    HorizontalStaggeredGrid,
+    GridStickyHeaders,
+    ListWithIndicator,
+    ElasticScroll,
+    SnapScroll,
+    KeyboardInput,
+    ThemedSample,
+    CustomControl,
+    AdvancedTelemetry
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GalleryApp() {
     var currentScreen by remember { mutableStateOf(Screen.Dashboard) }
+    val configuration = LocalConfiguration.current
 
     MaterialTheme {
         Scaffold(
@@ -76,7 +103,7 @@ fun GalleryApp() {
                     title = {
                         Text(
                             text = when (currentScreen) {
-                                Screen.Dashboard -> "QuickNav Gallery"
+                                Screen.Dashboard -> "Collection Gallery"
                                 else -> currentScreen.name.replace("([a-z])([A-Z])".toRegex(), "$1 $2")
                             }
                         )
@@ -110,7 +137,16 @@ fun GalleryApp() {
                     Screen.StickyHeaderList -> StickyHeaderListSample()
                     Screen.VerticalEdgedGrid -> VerticalEdgedGridSample()
                     Screen.HorizontalPagedGrid -> HorizontalPagedGridSample()
+                    Screen.VerticalStaggeredPinterest -> VerticalStaggeredPinterestSample()
+                    Screen.HorizontalStaggeredGrid -> HorizontalStaggeredGridSample()
+                    Screen.GridStickyHeaders -> GridStickyHeaderSample()
+                    Screen.ListWithIndicator -> ListWithIndicatorSample(configuration.orientation)
+                    Screen.ElasticScroll -> ElasticScrollSample()
+                    Screen.SnapScroll -> SnapScrollSample()
+                    Screen.KeyboardInput -> KeyboardNavigationSample()
                     Screen.ThemedSample -> ThemedNavigationSample()
+                    Screen.CustomControl -> CustomControlSample()
+                    Screen.AdvancedTelemetry -> AdvancedTelemetrySample()
                 }
             }
         }
@@ -134,14 +170,35 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
         item { CategoryHeader("Grids") }
         items(listOf(
             "Vertical Edged Grid" to Screen.VerticalEdgedGrid,
-            "Horizontal Paged Grid" to Screen.HorizontalPagedGrid
+            "Horizontal Paged Grid" to Screen.HorizontalPagedGrid,
+            "Vertical Staggered Pinterest" to Screen.VerticalStaggeredPinterest,
+            "Horizontal Staggered Grid" to Screen.HorizontalStaggeredGrid,
+            "Grid Sticky Headers" to Screen.GridStickyHeaders
+        )) { (label, screen) ->
+            SampleItem(label, onClick = { onNavigate(screen) })
+        }
+
+        item { CategoryHeader("Accessibility") }
+        item {
+            SampleItem("Keyboard & D-Pad", onClick = { onNavigate(Screen.KeyboardInput) })
+        }
+
+        item { CategoryHeader("Animation Presets") }
+        items(listOf(
+            "Elastic Scroll" to Screen.ElasticScroll,
+            "Snap Scroll" to Screen.SnapScroll
         )) { (label, screen) ->
             SampleItem(label, onClick = { onNavigate(screen) })
         }
 
         item { CategoryHeader("Customization") }
-        item {
-            SampleItem("Custom Labels & Icons", onClick = { onNavigate(Screen.ThemedSample) })
+        items(listOf(
+            "Scroll Indicators" to Screen.ListWithIndicator,
+            "Advanced Telemetry" to Screen.AdvancedTelemetry,
+            "Custom Labels & Icons" to Screen.ThemedSample,
+            "Custom Control (FAB)" to Screen.CustomControl
+        )) { (label, screen) ->
+            SampleItem(label, onClick = { onNavigate(screen) })
         }
     }
 }
