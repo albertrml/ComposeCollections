@@ -14,7 +14,7 @@ plugins {
     `maven-publish`
 }
 
-val libraryVersion = "0.2.10"
+val libraryVersion = "0.3.0"
 
 android {
     namespace = "br.com.arml.composecollections.collections"
