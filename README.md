@@ -44,7 +44,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    implementation("br.com.arml.composecollections:collections:0.2.10")
+    implementation("br.com.arml.composecollections:collections:0.3.0")
 }
 ```
 
