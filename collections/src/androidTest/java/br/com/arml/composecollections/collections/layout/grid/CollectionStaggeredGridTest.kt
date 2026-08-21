@@ -35,12 +35,20 @@ class CollectionStaggeredGridTest {
 
     private lateinit var pagedUpTag: String
     private lateinit var pagedDownTag: String
+    private lateinit var edgedUpTag: String
+    private lateinit var edgedDownTag: String
+    private lateinit var pagedComponentTag: String
+    private lateinit var edgedComponentTag: String
 
     @Before
     fun setup() {
         InstrumentationRegistry.getInstrumentation().targetContext.apply {
-            pagedUpTag = getString(R.string.pagedQuickNavList_upButton_testTag)
-            pagedDownTag = getString(R.string.pagedQuickNavList_downButton_testTag)
+            pagedUpTag = getString(R.string.collectionPagedLabel_upButton_testTag)
+            pagedDownTag = getString(R.string.collectionPagedLabel_downButton_testTag)
+            edgedUpTag = getString(R.string.collectionEdgedLabel_upButton_testTag)
+            edgedDownTag = getString(R.string.collectionEdgedLabel_downButton_testTag)
+            pagedComponentTag = getString(R.string.collectionPagedLabel_component_testTag)
+            edgedComponentTag = getString(R.string.collectionEdgedLabel_component_testTag)
         }
     }
 
@@ -64,5 +72,49 @@ class CollectionStaggeredGridTest {
         composeTestRule.onNodeWithTag(pagedUpTag).performClick()
         composeTestRule.waitForIdle()
         assert(state.firstVisibleItemIndex == 0)
+    }
+
+    @Test
+    fun edgedStaggeredGrid_shouldJumpToEnd() {
+        val state = LazyStaggeredGridState()
+        composeTestRule.setContent {
+            CollectionEdgedStaggeredGrid(
+                cells = StaggeredGridCells.Fixed(2),
+                gridState = state,
+                navigationAlignment = CollectionAlignment.Bottom
+            ) {
+                items(100) { Text("Item $it", modifier = Modifier.height(100.dp)) }
+            }
+        }
+
+        composeTestRule.onNodeWithTag(edgedDownTag).performClick()
+        composeTestRule.waitForIdle()
+        assert(state.firstVisibleItemIndex > 80)
+
+        composeTestRule.onNodeWithTag(edgedUpTag).performClick()
+        composeTestRule.waitForIdle()
+        assert(state.firstVisibleItemIndex == 0)
+    }
+
+    @Test
+    fun edgedStaggeredGrid_shouldHaveCorrectComponentTag() {
+        composeTestRule.setContent {
+            CollectionEdgedStaggeredGrid(
+                cells = StaggeredGridCells.Fixed(2),
+                navigationAlignment = CollectionAlignment.Bottom
+            ) { items(5) { Text("Item $it") } }
+        }
+        composeTestRule.onNodeWithTag(edgedComponentTag).assertExists()
+    }
+
+    @Test
+    fun pagedStaggeredGrid_shouldHaveCorrectComponentTag() {
+        composeTestRule.setContent {
+            CollectionPagedStaggeredGrid(
+                cells = StaggeredGridCells.Fixed(2),
+                navigationAlignment = CollectionAlignment.Bottom
+            ) { items(5) { Text("Item $it") } }
+        }
+        composeTestRule.onNodeWithTag(pagedComponentTag).assertExists()
     }
 }

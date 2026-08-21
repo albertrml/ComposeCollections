@@ -36,3 +36,9 @@ Thumbs.db
 *.aar
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
+
+# Documentação
+.gemini/docs/commit
+.gemini/docs/package
+.gemini/docs/pull-request
+.gemini/docs/release

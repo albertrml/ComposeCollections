@@ -35,7 +35,7 @@ class CollectionSlotTest {
     @Before
     fun setup() {
         InstrumentationRegistry.getInstrumentation().targetContext.apply {
-            defaultButtonTag = getString(R.string.pagedQuickNavList_downButton_testTag)
+            defaultButtonTag = getString(R.string.collectionPagedLabel_downButton_testTag)
         }
     }
 

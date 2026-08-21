@@ -10,6 +10,7 @@
 
 package br.com.arml.composecollections.collections.layout.list
 
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -23,6 +24,7 @@ import br.com.arml.composecollections.collections.components.indicators.Collecti
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionAnimationMode
 import br.com.arml.composecollections.collections.defaults.CollectionDefaults
+import br.com.arml.composecollections.collections.defaults.CollectionLabelDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
 import br.com.arml.composecollections.collections.defaults.CollectionMode
@@ -46,6 +48,14 @@ fun CollectionList(
     showIndicator: Boolean = false,
     expandLayout: Boolean = CollectionDefaults.expandLayout,
     uiState: CollectionUIState = rememberCollectionUIState(state.mode),
+    indicator: @Composable BoxScope.() -> Unit = {
+        if (showIndicator) {
+            CollectionLinearIndicator(
+                progress = state.scrollProgress,
+                isHorizontal = layoutSpec is CollectionLayoutSpec.Horizontal
+            )
+        }
+    },
     backwardControl: @Composable ((CollectionState) -> Unit)? = null,
     forwardControl: @Composable ((CollectionState) -> Unit)? = null,
     content: LazyListScope.() -> Unit,
@@ -53,7 +63,7 @@ fun CollectionList(
     val isHorizontal = layoutSpec is CollectionLayoutSpec.Horizontal
 
     CollectionScaffold(
-        modifier = modifier.testTag(CollectionDefaults.componentTestTag),
+        modifier = modifier.testTag(uiState.labels.componentTag),
         isOverlay = isOverlay,
         navigationAlignment = navigationAlignment,
         labels = uiState.labels,
@@ -64,14 +74,7 @@ fun CollectionList(
         expandLayout = expandLayout,
         backwardControl = backwardControl,
         forwardControl = forwardControl,
-        indicator = {
-            if (showIndicator) {
-                CollectionLinearIndicator(
-                    progress = state.scrollProgress,
-                    isHorizontal = isHorizontal
-                )
-            }
-        },
+        indicator = indicator,
     ) { containerModifier ->
         when (layoutSpec) {
             is CollectionLayoutSpec.Vertical -> LazyColumn(
@@ -148,6 +151,53 @@ fun CollectionEdgedList(
         modifier = modifier,
         layoutSpec = layoutSpec,
         navigationAlignment = navigationAlignment,
+        isOverlay = isOverlay,
+        showIndicator = showIndicator,
+        expandLayout = expandLayout,
+        backwardControl = backwardControl,
+        forwardControl = forwardControl,
+        content = content
+    )
+}
+
+/**
+ * A specialized list that scrolls by a fixed number of viewports.
+ *
+ * @param step The number of viewports to jump on each navigation action.
+ */
+@Composable
+fun CollectionSteppedList(
+    step: Int,
+    modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
+    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
+    layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
+    navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
+    isOverlay: Boolean = false,
+    showIndicator: Boolean = false,
+    expandLayout: Boolean = CollectionDefaults.expandLayout,
+    backwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    forwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    content: LazyListScope.() -> Unit
+) {
+    val state = rememberCollectionListState(
+        listState = listState,
+        mode = CollectionMode.Stepped,
+        animationMode = animationMode,
+        step = step
+    )
+
+    val uiState = rememberCollectionUIState(
+        mode = state.mode,
+        labels = CollectionLabelDefaults.steppedLabels(step)
+    )
+
+    CollectionList(
+        state = state,
+        modifier = modifier,
+        layoutSpec = layoutSpec,
+        navigationAlignment = navigationAlignment,
+        uiState = uiState,
         isOverlay = isOverlay,
         showIndicator = showIndicator,
         expandLayout = expandLayout,

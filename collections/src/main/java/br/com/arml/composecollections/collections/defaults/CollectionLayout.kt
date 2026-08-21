@@ -53,7 +53,8 @@ enum class CollectionMode {
     /** Navigates to the absolute start or end of the collection. */
     Edged,
     /** Navigates through the collection one visible viewport (page) at a time. */
-    Paged
+    Paged,
+    Stepped
 }
 
 /**

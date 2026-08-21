@@ -31,6 +31,7 @@ import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
 import br.com.arml.composecollections.collections.layout.grid.CollectionEdgedStaggeredGrid
 import br.com.arml.composecollections.collections.layout.grid.CollectionPagedStaggeredGrid
+import br.com.arml.composecollections.collections.layout.grid.CollectionSteppedStaggeredGrid
 import kotlin.random.Random
 
 @Composable
@@ -73,6 +74,22 @@ fun HorizontalStaggeredGridSample() {
                 navigationAlignment = CollectionAlignment.Bottom
             ) {
                 items(100) { StaggeredItem(it, isVertical = false) }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Stepped Staggered Grid")
+@Composable
+fun SteppedStaggeredGridSample() {
+    MaterialTheme {
+        Surface(Modifier.fillMaxSize()) {
+            CollectionSteppedStaggeredGrid(
+                cells = StaggeredGridCells.Fixed(2),
+                step = 2,
+                navigationAlignment = CollectionAlignment.Bottom
+            ) {
+                items(100) { StaggeredItem(it, isVertical = true) }
             }
         }
     }

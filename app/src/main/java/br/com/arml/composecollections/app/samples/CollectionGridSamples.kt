@@ -28,6 +28,7 @@ import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
 import br.com.arml.composecollections.collections.layout.grid.CollectionEdgedGrid
 import br.com.arml.composecollections.collections.layout.grid.CollectionPagedGrid
+import br.com.arml.composecollections.collections.layout.grid.CollectionSteppedGrid
 
 @Composable
 fun GridItem(index: Int) {
@@ -98,6 +99,22 @@ fun HorizontalPagedGridSample() {
             CollectionPagedGrid(
                 cells = GridCells.Fixed(3),
                 layoutSpec = CollectionLayoutSpec.Horizontal(),
+                navigationAlignment = CollectionAlignment.Bottom
+            ) {
+                items(100) { GridItem(it) }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Stepped Grid (Jump by 2)")
+@Composable
+fun SteppedGridSample() {
+    MaterialTheme {
+        Surface(Modifier.fillMaxSize()) {
+            CollectionSteppedGrid(
+                cells = GridCells.Fixed(3),
+                step = 2,
                 navigationAlignment = CollectionAlignment.Bottom
             ) {
                 items(100) { GridItem(it) }

@@ -13,8 +13,10 @@ package br.com.arml.composecollections.collections.layout.foundation
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,7 +51,7 @@ fun CollectionScaffold(
     collectionState: CollectionState,
     isHorizontal: Boolean,
     expandLayout: Boolean = false,
-    indicator: @Composable () -> Unit = {},
+    indicator: @Composable BoxScope.() -> Unit = {},
     topOverlay: @Composable () -> Unit = {},
     backwardControl: @Composable ((CollectionState) -> Unit)? = null,
     forwardControl: @Composable ((CollectionState) -> Unit)? = null,
@@ -74,52 +76,51 @@ fun CollectionScaffold(
             .focusable()
             .testTag(stringResource(R.string.quickNav_scaffold_keyboard_testTag))
 
-        if(isHorizontal){
-            Column(
-                modifier = modifier.then(keyboardModifier),
-                verticalArrangement = Arrangement.spacedBy(dimensions.panelToContentSpacing)
-            ) {
-                indicator()
-                Box(Modifier.weight(1f, fill = expandLayout)) {
-                    CollectionNavigationFrame(
-                        modifier = Modifier.fillMaxWidth(),
-                        isOverlay = isOverlay,
-                        expandLayout = expandLayout,
-                        navigationAlignment = navigationAlignment,
-                        collectionState = collectionState,
-                        isHorizontal = true,
-                        backwardControl = backwardControl,
-                        forwardControl = forwardControl,
-                        container = container
-                    )
-                    Box(Modifier.testTag(stringResource(R.string.quickNav_scaffold_header_overlay_testTag))) {
-                        topOverlay()
-                    }
+        val mainContent = @Composable { contentModifier: Modifier ->
+            Box(contentModifier) {
+                CollectionNavigationFrame(
+                    modifier = Modifier.fillMaxWidth(),
+                    isOverlay = isOverlay,
+                    expandLayout = expandLayout,
+                    navigationAlignment = navigationAlignment,
+                    collectionState = collectionState,
+                    isHorizontal = isHorizontal,
+                    backwardControl = backwardControl,
+                    forwardControl = forwardControl,
+                    container = container
+                )
+                Box(Modifier.testTag(stringResource(R.string.quickNav_scaffold_header_overlay_testTag))) {
+                    topOverlay()
+                }
+                
+                // If in overlay mode, the indicator is part of the stack
+                if (isOverlay) {
+                    indicator()
                 }
             }
         }
-        else {
-            Row(
-                modifier = modifier.then(keyboardModifier),
-                horizontalArrangement = Arrangement.spacedBy(dimensions.panelToContentSpacing)
-            ) {
-                Box(Modifier.weight(1f, fill = expandLayout)) {
-                    CollectionNavigationFrame(
-                        modifier = Modifier.fillMaxWidth(),
-                        isOverlay = isOverlay,
-                        expandLayout = expandLayout,
-                        navigationAlignment = navigationAlignment,
-                        collectionState = collectionState,
-                        isHorizontal = false,
-                        backwardControl = backwardControl,
-                        forwardControl = forwardControl,
-                        container = container
-                    )
-                    Box(Modifier.testTag(stringResource(R.string.quickNav_scaffold_header_overlay_testTag))) {
-                        topOverlay()
-                    }
+
+        if (isOverlay) {
+            mainContent(modifier.then(keyboardModifier))
+        } else {
+            if (isHorizontal) {
+                Column(
+                    modifier = modifier.then(keyboardModifier),
+                    verticalArrangement = Arrangement.spacedBy(dimensions.panelToContentSpacing)
+                ) {
+                    // In adjacent mode, wrap in a Box to provide BoxScope
+                    Box(Modifier.fillMaxWidth()) { indicator() }
+                    mainContent(Modifier.weight(1f, fill = expandLayout))
                 }
-                indicator()
+            } else {
+                Row(
+                    modifier = modifier.then(keyboardModifier),
+                    horizontalArrangement = Arrangement.spacedBy(dimensions.panelToContentSpacing)
+                ) {
+                    mainContent(Modifier.weight(1f, fill = expandLayout))
+                    // In adjacent mode, wrap in a Box to provide BoxScope
+                    Box(Modifier.fillMaxHeight()) { indicator() }
+                }
             }
         }
     }

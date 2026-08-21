@@ -12,11 +12,13 @@ package br.com.arml.composecollections.collections.defaults
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import br.com.arml.composecollections.collections.R
 
 @Immutable
 data class CollectionLabels(
+    val componentTag: String,
     val previousLabel: String,
     val previousContentDescription: String,
     val previousTag: String,
@@ -27,28 +29,45 @@ data class CollectionLabels(
 
 object CollectionLabelDefaults {
     @Composable
-    fun defaultLabels(mode: CollectionMode) = when (mode) {
+    fun defaultLabels(
+        mode: CollectionMode,
+        step: Int = 2
+    ) = when (mode) {
         CollectionMode.Edged -> edgedLabels()
         CollectionMode.Paged -> pagedLabels()
+        CollectionMode.Stepped -> steppedLabels(step.coerceAtLeast(2))
     }
 
     @Composable
     fun edgedLabels() = CollectionLabels(
-        previousLabel = stringResource(R.string.quickNavList_upButton_text),
-        previousContentDescription = stringResource(R.string.quickNavList_upButton_contentDescription),
-        previousTag = stringResource(R.string.quickNavList_upButton_testTag),
-        nextLabel = stringResource(R.string.quickNavList_downButton_text),
-        nextContentDescription = stringResource(R.string.quickNavList_downButton_contentDescription),
-        nextTag = stringResource(R.string.quickNavList_downButton_testTag)
+        componentTag = stringResource(R.string.collectionEdgedLabel_component_testTag),
+        previousLabel = stringResource(R.string.collectionEdgedLabel_upButton_text),
+        previousContentDescription = stringResource(R.string.collectionEdgedLabel_upButton_contentDescription),
+        previousTag = stringResource(R.string.collectionEdgedLabel_upButton_testTag),
+        nextLabel = stringResource(R.string.collectionEdgedLabel_downButton_text),
+        nextContentDescription = stringResource(R.string.collectionEdgedLabel_downButton_contentDescription),
+        nextTag = stringResource(R.string.collectionEdgedLabel_downButton_testTag)
     )
 
     @Composable
     fun pagedLabels() = CollectionLabels(
-        previousLabel = stringResource(R.string.pagedQuickNavList_upButton_text),
-        previousContentDescription = stringResource(R.string.pagedQuickNavList_upButton_contentDescription),
-        previousTag = stringResource(R.string.pagedQuickNavList_upButton_testTag),
-        nextLabel = stringResource(R.string.pagedQuickNavList_downButton_text),
-        nextContentDescription = stringResource(R.string.pagedQuickNavList_downButton_contentDescription),
-        nextTag = stringResource(R.string.pagedQuickNavList_downButton_testTag)
+        componentTag = stringResource(R.string.collectionPagedLabel_component_testTag),
+        previousLabel = stringResource(R.string.collectionPagedLabel_upButton_text),
+        previousContentDescription = stringResource(R.string.collectionPagedLabel_upButton_contentDescription),
+        previousTag = stringResource(R.string.collectionPagedLabel_upButton_testTag),
+        nextLabel = stringResource(R.string.collectionPagedLabel_downButton_text),
+        nextContentDescription = stringResource(R.string.collectionPagedLabel_downButton_contentDescription),
+        nextTag = stringResource(R.string.collectionPagedLabel_downButton_testTag)
+    )
+
+    @Composable
+    fun steppedLabels(step: Int) = CollectionLabels(
+        componentTag = stringResource(R.string.collectionSteppedLabel_component_testTag),
+        previousLabel = pluralStringResource(R.plurals.collectionSteppedLabel_upButton_text, step, step),
+        previousContentDescription = pluralStringResource(R.plurals.collectionSteppedLabel_upButton_contentDescription, step, step),
+        previousTag = stringResource(R.string.collectionSteppedLabel_upButton_testTag),
+        nextLabel = pluralStringResource(R.plurals.collectionSteppedLabel_downButton_text, step, step),
+        nextContentDescription = pluralStringResource(R.plurals.collectionSteppedLabel_downButton_contentDescription, step, step),
+        nextTag = stringResource(R.string.collectionSteppedLabel_downButton_testTag)
     )
 }
