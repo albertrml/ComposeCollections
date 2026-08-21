@@ -30,6 +30,7 @@ import br.com.arml.composecollections.collections.layout.list.CollectionPagedLis
 @Composable
 fun ThemedNavigationSample() {
     val portugueseLabels = CollectionLabels(
+        componentTag = "CustomPagedList",
         previousLabel = "Subir",
         previousContentDescription = "Rolar para o topo",
         previousTag = "Up",

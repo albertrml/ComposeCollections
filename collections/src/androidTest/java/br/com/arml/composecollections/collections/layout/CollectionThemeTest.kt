@@ -31,6 +31,7 @@ class CollectionThemeTest {
     @Test
     fun collectionTheme_shouldPropagateCustomLabels() {
         val customLabels = CollectionLabels(
+            componentTag = "CompTag",
             previousLabel = "Voltar",
             previousContentDescription = "Desc",
             previousTag = "Tag1",

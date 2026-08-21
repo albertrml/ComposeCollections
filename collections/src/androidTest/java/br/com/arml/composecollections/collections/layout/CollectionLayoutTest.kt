@@ -20,8 +20,10 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import br.com.arml.composecollections.collections.defaults.CollectionDefaults
+import androidx.test.platform.app.InstrumentationRegistry
+import br.com.arml.composecollections.collections.R
 import br.com.arml.composecollections.collections.layout.list.CollectionPagedList
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,7 +33,12 @@ class CollectionLayoutTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val componentTag = CollectionDefaults.componentTestTag
+    private lateinit var pagedTag: String
+
+    @Before
+    fun setup() {
+        pagedTag = InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.collectionPagedLabel_component_testTag)
+    }
 
     @Test
     fun collectionPagedList_withExpandLayoutFalse_shouldWrapHeight() {
@@ -44,7 +51,7 @@ class CollectionLayoutTest {
             }
         }
 
-        composeTestRule.onNodeWithTag(componentTag).assertHeightIsAtLeast(100.dp)
+        composeTestRule.onNodeWithTag(pagedTag).assertHeightIsAtLeast(100.dp)
     }
 
     @Test
@@ -58,6 +65,6 @@ class CollectionLayoutTest {
             }
         }
 
-        composeTestRule.onNodeWithTag(componentTag).assertHeightIsAtLeast(300.dp)
+        composeTestRule.onNodeWithTag(pagedTag).assertHeightIsAtLeast(300.dp)
     }
 }

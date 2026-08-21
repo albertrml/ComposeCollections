@@ -37,8 +37,8 @@ class CollectionGeneralistTest {
     @Before
     fun setup() {
         InstrumentationRegistry.getInstrumentation().targetContext.apply {
-            pagedDownTag = getString(R.string.pagedQuickNavList_downButton_testTag)
-            edgedDownTag = getString(R.string.quickNavList_downButton_testTag)
+            pagedDownTag = getString(R.string.collectionPagedLabel_downButton_testTag)
+            edgedDownTag = getString(R.string.collectionEdgedLabel_downButton_testTag)
         }
     }
 

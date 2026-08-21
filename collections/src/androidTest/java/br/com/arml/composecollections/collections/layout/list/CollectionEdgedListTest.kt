@@ -36,12 +36,14 @@ class CollectionEdgedListTest {
 
     private lateinit var upButtonTag: String
     private lateinit var downButtonTag: String
+    private lateinit var componentTag: String
 
     @Before
     fun setup() {
         InstrumentationRegistry.getInstrumentation().targetContext.apply {
-            upButtonTag = getString(R.string.quickNavList_upButton_testTag)
-            downButtonTag = getString(R.string.quickNavList_downButton_testTag)
+            upButtonTag = getString(R.string.collectionEdgedLabel_upButton_testTag)
+            downButtonTag = getString(R.string.collectionEdgedLabel_downButton_testTag)
+            componentTag = getString(R.string.collectionEdgedLabel_component_testTag)
         }
     }
 
@@ -71,5 +73,17 @@ class CollectionEdgedListTest {
         composeTestRule.runOnIdle {
             assert(state.firstVisibleItemIndex == 0)
         }
+    }
+
+    @Test
+    fun edgedList_shouldHaveCorrectComponentTag() {
+        composeTestRule.setContent {
+            CollectionEdgedList(
+                navigationAlignment = CollectionAlignment.Bottom
+            ) {
+                items(10) { Text("Item $it") }
+            }
+        }
+        composeTestRule.onNodeWithTag(componentTag).assertExists()
     }
 }

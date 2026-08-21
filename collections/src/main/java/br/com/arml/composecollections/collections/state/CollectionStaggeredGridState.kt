@@ -36,8 +36,11 @@ import kotlin.math.roundToInt
 open class CollectionStaggeredGridState(
     val gridState: LazyStaggeredGridState,
     override val mode: CollectionMode = CollectionMode.Edged,
-    override val animationSpec: AnimationSpec<Float>? = null
+    override val animationSpec: AnimationSpec<Float>? = null,
+    step: Int = 2
 ) : CollectionState {
+
+    val step = step.coerceAtLeast(2)
 
     override val isScrolling by derivedStateOf { gridState.isScrollInProgress }
 
@@ -110,14 +113,14 @@ open class CollectionStaggeredGridState(
     override fun animateScrollToBackward(scope: CoroutineScope) = scope.launch {
         when (mode) {
             CollectionMode.Edged -> animateScrollToStart(scope)
-            CollectionMode.Paged -> animateScrollToPreviousPage(scope)
+            CollectionMode.Paged, CollectionMode.Stepped -> animateScrollToPreviousPage(scope)
         }
     }
 
     override fun animateScrollToForward(scope: CoroutineScope) = scope.launch {
         when (mode) {
             CollectionMode.Edged -> animateScrollToEnd(scope)
-            CollectionMode.Paged -> animateScrollToNextPage(scope)
+            CollectionMode.Paged, CollectionMode.Stepped -> animateScrollToNextPage(scope)
         }
     }
 
@@ -132,14 +135,14 @@ open class CollectionStaggeredGridState(
 
     private fun animateScrollToPreviousPage(scope: CoroutineScope) = scope.launch {
         val visibleItemsCount = gridState.layoutInfo.visibleItemsInfo.size
-        val targetIndex = (gridState.firstVisibleItemIndex - visibleItemsCount).coerceAtLeast(0)
+        val targetIndex = (gridState.firstVisibleItemIndex - (visibleItemsCount * step)).coerceAtLeast(0)
         gridState.animateScrollToItem(targetIndex)
     }
 
     private fun animateScrollToNextPage(scope: CoroutineScope) = scope.launch {
         val visibleItemsCount = gridState.layoutInfo.visibleItemsInfo.size
         val maximumIndex = gridState.layoutInfo.totalItemsCount - 1
-        val targetIndex = (gridState.firstVisibleItemIndex + visibleItemsCount).coerceAtMost(maximumIndex)
+        val targetIndex = (gridState.firstVisibleItemIndex + (visibleItemsCount * step)).coerceAtMost(maximumIndex)
         if (targetIndex >= 0) { gridState.animateScrollToItem(targetIndex) }
     }
 
@@ -154,10 +157,11 @@ open class CollectionStaggeredGridState(
 fun rememberCollectionStaggeredGridState(
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     mode: CollectionMode = CollectionMode.Paged,
-    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default
+    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
+    step: Int = 1
 ): CollectionStaggeredGridState {
     val spec = getCollectionAnimation(animationMode)
-    return remember(gridState, mode, spec) {
-        CollectionStaggeredGridState(gridState, mode, spec)
+    return remember(gridState, mode, spec, step) {
+        CollectionStaggeredGridState(gridState, mode, spec, step)
     }
 }

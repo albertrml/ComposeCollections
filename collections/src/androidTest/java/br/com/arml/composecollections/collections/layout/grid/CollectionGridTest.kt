@@ -36,12 +36,20 @@ class CollectionGridTest {
 
     private lateinit var edgedUpTag: String
     private lateinit var edgedDownTag: String
+    private lateinit var pagedUpTag: String
+    private lateinit var pagedDownTag: String
+    private lateinit var edgedComponentTag: String
+    private lateinit var pagedComponentTag: String
 
     @Before
     fun setup() {
         InstrumentationRegistry.getInstrumentation().targetContext.apply {
-            edgedUpTag = getString(R.string.quickNavList_upButton_testTag)
-            edgedDownTag = getString(R.string.quickNavList_downButton_testTag)
+            edgedUpTag = getString(R.string.collectionEdgedLabel_upButton_testTag)
+            edgedDownTag = getString(R.string.collectionEdgedLabel_downButton_testTag)
+            pagedUpTag = getString(R.string.collectionPagedLabel_upButton_testTag)
+            pagedDownTag = getString(R.string.collectionPagedLabel_downButton_testTag)
+            edgedComponentTag = getString(R.string.collectionEdgedLabel_component_testTag)
+            pagedComponentTag = getString(R.string.collectionPagedLabel_component_testTag)
         }
     }
 
@@ -63,7 +71,6 @@ class CollectionGridTest {
         composeTestRule.waitForIdle()
         
         // With 100 items and 2 columns, rows are ~50.
-        // animateScrollToItem(99)
         composeTestRule.runOnIdle {
             assert(state.firstVisibleItemIndex > 80) // Safer assertion
         }
@@ -74,5 +81,49 @@ class CollectionGridTest {
         composeTestRule.runOnIdle {
             assert(state.firstVisibleItemIndex == 0)
         }
+    }
+
+    @Test
+    fun pagedGrid_shouldNavigateByPages() {
+        val state = LazyGridState()
+        composeTestRule.setContent {
+            CollectionPagedGrid(
+                cells = GridCells.Fixed(2),
+                gridState = state,
+                navigationAlignment = CollectionAlignment.Bottom
+            ) {
+                items(100) { Text("Item $it", modifier = Modifier.height(100.dp).fillMaxWidth()) }
+            }
+        }
+
+        composeTestRule.onNodeWithTag(pagedDownTag).performClick()
+        composeTestRule.waitForIdle()
+        assert(state.firstVisibleItemIndex > 0)
+
+        composeTestRule.onNodeWithTag(pagedUpTag).performClick()
+        composeTestRule.waitForIdle()
+        assert(state.firstVisibleItemIndex == 0)
+    }
+
+    @Test
+    fun edgedGrid_shouldHaveCorrectComponentTag() {
+        composeTestRule.setContent {
+            CollectionEdgedGrid(
+                cells = GridCells.Fixed(2),
+                navigationAlignment = CollectionAlignment.Bottom
+            ) { items(5) { Text("Item $it") } }
+        }
+        composeTestRule.onNodeWithTag(edgedComponentTag).assertExists()
+    }
+
+    @Test
+    fun pagedGrid_shouldHaveCorrectComponentTag() {
+        composeTestRule.setContent {
+            CollectionPagedGrid(
+                cells = GridCells.Fixed(2),
+                navigationAlignment = CollectionAlignment.Bottom
+            ) { items(5) { Text("Item $it") } }
+        }
+        composeTestRule.onNodeWithTag(pagedComponentTag).assertExists()
     }
 }

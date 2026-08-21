@@ -36,12 +36,14 @@ class CollectionPagedListTest {
 
     private lateinit var upButtonTag: String
     private lateinit var downButtonTag: String
+    private lateinit var componentTag: String
 
     @Before
     fun setup() {
         InstrumentationRegistry.getInstrumentation().targetContext.apply {
-            upButtonTag = getString(R.string.pagedQuickNavList_upButton_testTag)
-            downButtonTag = getString(R.string.pagedQuickNavList_downButton_testTag)
+            upButtonTag = getString(R.string.collectionPagedLabel_upButton_testTag)
+            downButtonTag = getString(R.string.collectionPagedLabel_downButton_testTag)
+            componentTag = getString(R.string.collectionPagedLabel_component_testTag)
         }
     }
 
@@ -87,5 +89,17 @@ class CollectionPagedListTest {
         composeTestRule.onNodeWithTag(upButtonTag).performClick()
         composeTestRule.waitForIdle()
         assert(state.firstVisibleItemIndex == 0)
+    }
+
+    @Test
+    fun pagedList_shouldHaveCorrectComponentTag() {
+        composeTestRule.setContent {
+            CollectionPagedList(
+                navigationAlignment = CollectionAlignment.Bottom
+            ) {
+                items(10) { Text("Item $it") }
+            }
+        }
+        composeTestRule.onNodeWithTag(componentTag).assertExists()
     }
 }

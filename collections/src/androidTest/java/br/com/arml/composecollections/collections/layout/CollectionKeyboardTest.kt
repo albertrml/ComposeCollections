@@ -26,10 +26,12 @@ import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import br.com.arml.composecollections.collections.defaults.CollectionDefaults
+import androidx.test.platform.app.InstrumentationRegistry
+import br.com.arml.composecollections.collections.R
 import br.com.arml.composecollections.collections.layout.grid.CollectionPagedGrid
 import br.com.arml.composecollections.collections.layout.list.CollectionPagedList
 import kotlinx.coroutines.runBlocking
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +41,12 @@ class CollectionKeyboardTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val componentTag = CollectionDefaults.componentTestTag
+    private lateinit var pagedTag: String
+
+    @Before
+    fun setup() {
+        pagedTag = InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.collectionPagedLabel_component_testTag)
+    }
 
     @OptIn(ExperimentalTestApi::class)
     @Test
@@ -51,8 +58,8 @@ class CollectionKeyboardTest {
             }
         }
 
-        composeTestRule.onNodeWithTag(componentTag).requestFocus()
-        composeTestRule.onNodeWithTag(componentTag).performKeyInput { pressKey(Key.PageDown) }
+        composeTestRule.onNodeWithTag(pagedTag).requestFocus()
+        composeTestRule.onNodeWithTag(pagedTag).performKeyInput { pressKey(Key.PageDown) }
         
         composeTestRule.waitForIdle()
         assert(state.firstVisibleItemIndex > 0)
@@ -73,8 +80,8 @@ class CollectionKeyboardTest {
         }
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithTag(componentTag).requestFocus()
-        composeTestRule.onNodeWithTag(componentTag).performKeyInput { pressKey(Key.MoveHome) }
+        composeTestRule.onNodeWithTag(pagedTag).requestFocus()
+        composeTestRule.onNodeWithTag(pagedTag).performKeyInput { pressKey(Key.MoveHome) }
         
         composeTestRule.waitForIdle()
         assert(state.firstVisibleItemIndex == 0)

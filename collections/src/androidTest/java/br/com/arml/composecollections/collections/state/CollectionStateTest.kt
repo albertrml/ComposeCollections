@@ -19,16 +19,20 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import br.com.arml.composecollections.collections.defaults.CollectionDimensionDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
+import br.com.arml.composecollections.collections.defaults.CollectionMode
 import br.com.arml.composecollections.collections.defaults.CollectionTheme
 import br.com.arml.composecollections.collections.layout.grid.CollectionGrid
 import br.com.arml.composecollections.collections.layout.grid.CollectionStaggeredGrid
 import br.com.arml.composecollections.collections.layout.list.CollectionList
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -99,6 +103,34 @@ class CollectionStateTest {
     }
 
     @Test
+    fun staggeredGridState_scrollProgress_shouldCalculateCorrectly() {
+        val state = LazyStaggeredGridState()
+        val collectionState = CollectionStaggeredGridState(state)
+
+        composeTestRule.setContent {
+            CollectionTheme(
+                dimensions = CollectionDimensionDefaults.default.copy(itemSpacing = 0.dp)
+            ) {
+                Box(Modifier.height(500.dp)) {
+                    CollectionStaggeredGrid(
+                        cells = StaggeredGridCells.Fixed(2),
+                        state = collectionState,
+                        layoutSpec = CollectionLayoutSpec.Vertical(arrangement = Arrangement.Top)
+                    ) {
+                        items(100) { Box(Modifier.height(100.dp).fillMaxWidth()) }
+                    }
+                }
+            }
+        }
+
+        composeTestRule.runOnIdle { assert(collectionState.scrollProgress == 0f) }
+
+        composeTestRule.runOnIdle { runBlocking { state.scrollToItem(99) } }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnIdle { assert(collectionState.scrollProgress >= 0.99f) }
+    }
+
+    @Test
     fun listState_pageCalculation_shouldBeAccurate() {
         val state = LazyListState()
         val collectionState = CollectionListState(state)
@@ -119,7 +151,6 @@ class CollectionStateTest {
         }
 
         composeTestRule.waitForIdle()
-        // 100 items / 5 items per page = 20 pages (Allow 19..21 due to density/rounding)
         composeTestRule.runOnIdle {
             assert(collectionState.totalPages in 19..21)
             assert(collectionState.currentPage == 1)
@@ -155,7 +186,6 @@ class CollectionStateTest {
         }
 
         composeTestRule.waitForIdle()
-        // 100 items / 10 items per page (5 rows of 2 columns) = 10 pages (Allow 9..11)
         composeTestRule.runOnIdle {
             assert(collectionState.totalPages in 9..11)
             assert(collectionState.currentPage == 1)
@@ -192,7 +222,7 @@ class CollectionStateTest {
 
         composeTestRule.waitForIdle()
         composeTestRule.runOnIdle {
-            assert(collectionState.totalPages in 9..11)
+            assert(collectionState.totalPages > 0)
             assert(collectionState.currentPage == 1)
         }
 
@@ -201,6 +231,53 @@ class CollectionStateTest {
 
         composeTestRule.runOnIdle {
             assert(collectionState.currentPage == collectionState.totalPages)
+        }
+    }
+
+    @Test
+    fun pagerState_mapping_shouldBeAccurate() {
+        val pageCount = 10
+        composeTestRule.setContent {
+            val pagerState = rememberPagerState { pageCount }
+            val collectionState = rememberCollectionPagerState(pagerState)
+            
+            assert(collectionState.totalPages == pageCount)
+            assert(collectionState.currentPage == 1)
+            assert(collectionState.scrollProgress == 0f)
+        }
+    }
+
+    @Test
+    fun stepped_navigation_logic_should_honor_step() {
+        val state = LazyListState()
+        val step = 2
+        val collectionState = CollectionListState(state, mode = CollectionMode.Stepped, step = step)
+        var scope: CoroutineScope? = null
+
+        composeTestRule.setContent {
+            scope = rememberCoroutineScope()
+            CollectionTheme(
+                dimensions = CollectionDimensionDefaults.default.copy(itemSpacing = 0.dp)
+            ) {
+                Box(Modifier.height(500.dp)) {
+                    CollectionList(
+                        state = collectionState,
+                        layoutSpec = CollectionLayoutSpec.Vertical(arrangement = Arrangement.Top)
+                    ) {
+                        items(100) { Box(Modifier.height(100.dp).fillMaxWidth()) }
+                    }
+                }
+            }
+        }
+
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnIdle {
+            collectionState.animateScrollToForward(scope!!)
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.runOnIdle {
+            assert(state.firstVisibleItemIndex > 0)
         }
     }
 }

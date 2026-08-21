@@ -56,7 +56,7 @@ fun CollectionButtonPreview(){
         text = "Jump to Top",
         icon = Icons.Filled.KeyboardArrowUp,
         iconContentDescription = stringResource(
-            R.string.quickNavList_upButton_contentDescription
+            R.string.collectionEdgedLabel_upButton_contentDescription
         )
     )
 }

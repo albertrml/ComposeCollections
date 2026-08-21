@@ -12,6 +12,7 @@ package br.com.arml.composecollections.collections.layout.grid
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
@@ -28,6 +29,7 @@ import br.com.arml.composecollections.collections.components.indicators.Collecti
 import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionAnimationMode
 import br.com.arml.composecollections.collections.defaults.CollectionDefaults
+import br.com.arml.composecollections.collections.defaults.CollectionLabelDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutDefaults
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
 import br.com.arml.composecollections.collections.defaults.CollectionMode
@@ -38,8 +40,8 @@ import br.com.arml.composecollections.collections.layout.foundation.CollectionSc
 import br.com.arml.composecollections.collections.layout.grid.scope.CollectionStaggeredGridScope
 import br.com.arml.composecollections.collections.layout.grid.scope.CollectionStaggeredGridScopeImpl
 import br.com.arml.composecollections.collections.layout.grid.scope.renderCollectionItems
-import br.com.arml.composecollections.collections.state.CollectionStaggeredGridState
 import br.com.arml.composecollections.collections.state.CollectionState
+import br.com.arml.composecollections.collections.state.CollectionStaggeredGridState
 import br.com.arml.composecollections.collections.state.rememberCollectionStaggeredGridState
 
 /**
@@ -47,8 +49,8 @@ import br.com.arml.composecollections.collections.state.rememberCollectionStagge
  */
 @Composable
 fun CollectionStaggeredGrid(
-    cells: StaggeredGridCells,
     state: CollectionStaggeredGridState,
+    cells: StaggeredGridCells,
     modifier: Modifier = Modifier,
     layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
     navigationAlignment: CollectionAlignment = CollectionAlignment.None,
@@ -56,6 +58,14 @@ fun CollectionStaggeredGrid(
     showIndicator: Boolean = false,
     expandLayout: Boolean = CollectionDefaults.expandLayout,
     uiState: CollectionUIState = rememberCollectionUIState(state.mode),
+    indicator: @Composable BoxScope.() -> Unit = {
+        if (showIndicator) {
+            CollectionLinearIndicator(
+                progress = state.scrollProgress,
+                isHorizontal = layoutSpec is CollectionLayoutSpec.Horizontal
+            )
+        }
+    },
     backwardControl: @Composable ((CollectionState) -> Unit)? = null,
     forwardControl: @Composable ((CollectionState) -> Unit)? = null,
     content: CollectionStaggeredGridScope.() -> Unit
@@ -70,7 +80,7 @@ fun CollectionStaggeredGrid(
     }
 
     CollectionScaffold(
-        modifier = modifier.testTag(CollectionDefaults.componentTestTag),
+        modifier = modifier.testTag(uiState.labels.componentTag),
         isOverlay = isOverlay,
         navigationAlignment = navigationAlignment,
         labels = uiState.labels,
@@ -81,14 +91,7 @@ fun CollectionStaggeredGrid(
         expandLayout = expandLayout,
         backwardControl = backwardControl,
         forwardControl = forwardControl,
-        indicator = {
-            if (showIndicator) {
-                CollectionLinearIndicator(
-                    progress = state.scrollProgress,
-                    isHorizontal = isHorizontal
-                )
-            }
-        },
+        indicator = indicator,
         topOverlay = {
             currentHeaderIndex?.let { index ->
                 Box(modifier = Modifier.fillMaxWidth()) {
@@ -182,6 +185,54 @@ fun CollectionEdgedStaggeredGrid(
         modifier = modifier,
         layoutSpec = layoutSpec,
         navigationAlignment = navigationAlignment,
+        isOverlay = isOverlay,
+        showIndicator = showIndicator,
+        expandLayout = expandLayout,
+        backwardControl = backwardControl,
+        forwardControl = forwardControl,
+        content = content
+    )
+}
+
+/**
+ * A specialized staggered grid that scrolls by a fixed number of viewports.
+ *
+ * @param step The number of viewports to jump on each navigation action.
+ */
+@Composable
+fun CollectionSteppedStaggeredGrid(
+    cells: StaggeredGridCells,
+    step: Int,
+    modifier: Modifier = Modifier,
+    gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
+    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
+    layoutSpec: CollectionLayoutSpec = CollectionLayoutDefaults.Vertical,
+    navigationAlignment: CollectionAlignment = CollectionAlignment.Bottom,
+    isOverlay: Boolean = false,
+    showIndicator: Boolean = false,
+    expandLayout: Boolean = CollectionDefaults.expandLayout,
+    backwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    forwardControl: @Composable ((CollectionState) -> Unit)? = null,
+    content: CollectionStaggeredGridScope.() -> Unit
+) {
+    val state = rememberCollectionStaggeredGridState(
+        gridState = gridState,
+        mode = CollectionMode.Stepped,
+        animationMode = animationMode,
+        step = step
+    )
+    val uiState = rememberCollectionUIState(
+        mode = state.mode,
+        labels = CollectionLabelDefaults.steppedLabels(step)
+    )
+
+    CollectionStaggeredGrid(
+        cells = cells,
+        state = state,
+        modifier = modifier,
+        layoutSpec = layoutSpec,
+        navigationAlignment = navigationAlignment,
+        uiState = uiState,
         isOverlay = isOverlay,
         showIndicator = showIndicator,
         expandLayout = expandLayout,

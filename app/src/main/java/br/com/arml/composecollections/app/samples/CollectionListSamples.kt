@@ -26,6 +26,7 @@ import br.com.arml.composecollections.collections.defaults.CollectionAlignment
 import br.com.arml.composecollections.collections.defaults.CollectionLayoutSpec
 import br.com.arml.composecollections.collections.layout.list.CollectionEdgedList
 import br.com.arml.composecollections.collections.layout.list.CollectionPagedList
+import br.com.arml.composecollections.collections.layout.list.CollectionSteppedList
 
 @Preview(showBackground = true, name = "Vertical Paged List")
 @Composable
@@ -126,6 +127,20 @@ fun StickyHeaderListSample() {
                     ListItem(index)
                 }
             }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Stepped List (Jump by 3)")
+@Composable
+fun SteppedListSample() {
+    MaterialTheme {
+        CollectionSteppedList(
+            step = 3,
+            modifier = Modifier.fillMaxSize(),
+            navigationAlignment = CollectionAlignment.Bottom
+        ) {
+            items(100) { ListItem(it) }
         }
     }
 }

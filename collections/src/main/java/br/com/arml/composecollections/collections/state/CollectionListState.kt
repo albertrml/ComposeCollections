@@ -33,8 +33,11 @@ import kotlin.math.roundToInt
 open class CollectionListState(
     val listState: LazyListState,
     override val mode: CollectionMode = CollectionMode.Edged,
-    override val animationSpec: AnimationSpec<Float>? = null
+    override val animationSpec: AnimationSpec<Float>? = null,
+    step: Int = 2
 ) : CollectionState {
+
+    val step = step.coerceAtLeast(2)
 
     override val isScrolling by derivedStateOf { listState.isScrollInProgress }
 
@@ -105,14 +108,14 @@ open class CollectionListState(
     override fun animateScrollToBackward(scope: CoroutineScope) = scope.launch {
         when (mode) {
             CollectionMode.Edged -> animateScrollToStart(scope)
-            CollectionMode.Paged -> animateScrollToPreviousPage(scope)
+            CollectionMode.Paged, CollectionMode.Stepped -> animateScrollToPreviousPage(scope)
         }
     }
 
     override fun animateScrollToForward(scope: CoroutineScope) = scope.launch {
         when (mode) {
             CollectionMode.Edged -> animateScrollToEnd(scope)
-            CollectionMode.Paged -> animateScrollToNextPage(scope)
+            CollectionMode.Paged, CollectionMode.Stepped -> animateScrollToNextPage(scope)
         }
     }
 
@@ -127,14 +130,14 @@ open class CollectionListState(
 
     private fun animateScrollToPreviousPage(scope: CoroutineScope) = scope.launch {
         val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size
-        val targetIndex = (listState.firstVisibleItemIndex - visibleItemsCount).coerceAtLeast(0)
+        val targetIndex = (listState.firstVisibleItemIndex - (visibleItemsCount * step)).coerceAtLeast(0)
         listState.animateScrollToItem(targetIndex)
     }
 
     private fun animateScrollToNextPage(scope: CoroutineScope) = scope.launch {
         val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size
         val maximumIndex = listState.layoutInfo.totalItemsCount - 1
-        val targetIndex = (listState.firstVisibleItemIndex + visibleItemsCount).coerceAtMost(maximumIndex)
+        val targetIndex = (listState.firstVisibleItemIndex + (visibleItemsCount * step)).coerceAtMost(maximumIndex)
         if (targetIndex >= 0) { listState.animateScrollToItem(targetIndex) }
     }
 }
@@ -146,10 +149,11 @@ open class CollectionListState(
 fun rememberCollectionListState(
     listState: LazyListState = rememberLazyListState(),
     mode: CollectionMode = CollectionMode.Edged,
-    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default
+    animationMode: CollectionAnimationMode = CollectionAnimationMode.Default,
+    step: Int = 1
 ): CollectionListState {
     val spec = getCollectionAnimation(animationMode)
-    return remember(listState, mode, spec) {
-        CollectionListState(listState, mode, spec)
+    return remember(listState, mode, spec, step) {
+        CollectionListState(listState, mode, spec, step)
     }
 }

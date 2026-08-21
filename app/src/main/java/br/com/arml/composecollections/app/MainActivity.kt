@@ -42,7 +42,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import br.com.arml.composecollections.app.samples.AdvancedTelemetrySample
+import br.com.arml.composecollections.app.samples.BasicHorizontalPagerSample
+import br.com.arml.composecollections.app.samples.BasicVerticalPagerSample
 import br.com.arml.composecollections.app.samples.CustomControlSample
+import br.com.arml.composecollections.app.samples.EdgedPagerSample
 import br.com.arml.composecollections.app.samples.ElasticScrollSample
 import br.com.arml.composecollections.app.samples.GridStickyHeaderSample
 import br.com.arml.composecollections.app.samples.HorizontalEdgedListSample
@@ -51,7 +54,12 @@ import br.com.arml.composecollections.app.samples.HorizontalPagedListSample
 import br.com.arml.composecollections.app.samples.HorizontalStaggeredGridSample
 import br.com.arml.composecollections.app.samples.KeyboardNavigationSample
 import br.com.arml.composecollections.app.samples.ListWithIndicatorSample
+import br.com.arml.composecollections.app.samples.PagedPagerSample
 import br.com.arml.composecollections.app.samples.SnapScrollSample
+import br.com.arml.composecollections.app.samples.SteppedGridSample
+import br.com.arml.composecollections.app.samples.SteppedListSample
+import br.com.arml.composecollections.app.samples.SteppedPagerSample
+import br.com.arml.composecollections.app.samples.SteppedStaggeredGridSample
 import br.com.arml.composecollections.app.samples.StickyHeaderListSample
 import br.com.arml.composecollections.app.samples.ThemedNavigationSample
 import br.com.arml.composecollections.app.samples.VerticalEdgedGridSample
@@ -76,18 +84,26 @@ enum class Screen {
     HorizontalEdgedList,
     VerticalOverlayList,
     StickyHeaderList,
+    SteppedList,
     VerticalEdgedGrid,
     HorizontalPagedGrid,
     VerticalStaggeredPinterest,
     HorizontalStaggeredGrid,
     GridStickyHeaders,
+    SteppedGrid,
+    SteppedStaggeredGrid,
     ListWithIndicator,
     ElasticScroll,
     SnapScroll,
     KeyboardInput,
     ThemedSample,
     CustomControl,
-    AdvancedTelemetry
+    AdvancedTelemetry,
+    BasicHorizontalPager,
+    BasicVerticalPager,
+    EdgedPager,
+    PagedPager,
+    SteppedPager
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -135,11 +151,14 @@ fun GalleryApp() {
                     Screen.HorizontalEdgedList -> HorizontalEdgedListSample()
                     Screen.VerticalOverlayList -> VerticalOverlayListSample()
                     Screen.StickyHeaderList -> StickyHeaderListSample()
+                    Screen.SteppedList -> SteppedListSample()
                     Screen.VerticalEdgedGrid -> VerticalEdgedGridSample()
                     Screen.HorizontalPagedGrid -> HorizontalPagedGridSample()
                     Screen.VerticalStaggeredPinterest -> VerticalStaggeredPinterestSample()
                     Screen.HorizontalStaggeredGrid -> HorizontalStaggeredGridSample()
                     Screen.GridStickyHeaders -> GridStickyHeaderSample()
+                    Screen.SteppedGrid -> SteppedGridSample()
+                    Screen.SteppedStaggeredGrid -> SteppedStaggeredGridSample()
                     Screen.ListWithIndicator -> ListWithIndicatorSample(configuration.orientation)
                     Screen.ElasticScroll -> ElasticScrollSample()
                     Screen.SnapScroll -> SnapScrollSample()
@@ -147,6 +166,11 @@ fun GalleryApp() {
                     Screen.ThemedSample -> ThemedNavigationSample()
                     Screen.CustomControl -> CustomControlSample()
                     Screen.AdvancedTelemetry -> AdvancedTelemetrySample()
+                    Screen.BasicHorizontalPager -> BasicHorizontalPagerSample()
+                    Screen.BasicVerticalPager -> BasicVerticalPagerSample()
+                    Screen.EdgedPager -> EdgedPagerSample()
+                    Screen.PagedPager -> PagedPagerSample()
+                    Screen.SteppedPager -> SteppedPagerSample()
                 }
             }
         }
@@ -161,8 +185,9 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
             "Vertical Paged List" to Screen.VerticalPagedList,
             "Horizontal Paged List" to Screen.HorizontalPagedList,
             "Horizontal Edged List" to Screen.HorizontalEdgedList,
+            "Stepped List (Jump by 3)" to Screen.SteppedList,
             "Vertical Overlay List" to Screen.VerticalOverlayList,
-            "Sticky Header List" to Screen.StickyHeaderList
+            "Sticky Header List" to Screen.StickyHeaderList,
         )) { (label, screen) ->
             SampleItem(label, onClick = { onNavigate(screen) })
         }
@@ -171,9 +196,38 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
         items(listOf(
             "Vertical Edged Grid" to Screen.VerticalEdgedGrid,
             "Horizontal Paged Grid" to Screen.HorizontalPagedGrid,
-            "Vertical Staggered Pinterest" to Screen.VerticalStaggeredPinterest,
-            "Horizontal Staggered Grid" to Screen.HorizontalStaggeredGrid,
+            "Stepped Grid (Jump by 2)" to Screen.SteppedGrid,
             "Grid Sticky Headers" to Screen.GridStickyHeaders
+        )) { (label, screen) ->
+            SampleItem(label, onClick = { onNavigate(screen) })
+        }
+
+        item { CategoryHeader("Staggered Grids") }
+        items(listOf(
+            "Vertical Edged Staggered Pinterest" to Screen.VerticalStaggeredPinterest,
+            "Horizontal Paged Staggered Grid" to Screen.HorizontalStaggeredGrid,
+            "Stepped Staggered Grid" to Screen.SteppedStaggeredGrid
+        )) { (label, screen) ->
+            SampleItem(label, onClick = { onNavigate(screen) })
+        }
+
+        item { CategoryHeader("Pagers") }
+        items(listOf(
+            "Basic Horizontal Pager (1-by-1)" to Screen.BasicHorizontalPager,
+            "Basic Vertical Pager (1-by-1)" to Screen.BasicVerticalPager,
+            "Edged Pager (Ends)" to Screen.EdgedPager,
+            "Paged Pager (1 Page)" to Screen.PagedPager,
+            "Stepped Pager (3 Pages)" to Screen.SteppedPager
+        )) { (label, screen) ->
+            SampleItem(label, onClick = { onNavigate(screen) })
+        }
+
+        item { CategoryHeader("Customization") }
+        items(listOf(
+            "Scroll Indicators" to Screen.ListWithIndicator,
+            "Advanced Telemetry" to Screen.AdvancedTelemetry,
+            "Custom Labels & Icons" to Screen.ThemedSample,
+            "Custom Control (FAB)" to Screen.CustomControl
         )) { (label, screen) ->
             SampleItem(label, onClick = { onNavigate(screen) })
         }
@@ -187,16 +241,6 @@ fun Dashboard(onNavigate: (Screen) -> Unit) {
         items(listOf(
             "Elastic Scroll" to Screen.ElasticScroll,
             "Snap Scroll" to Screen.SnapScroll
-        )) { (label, screen) ->
-            SampleItem(label, onClick = { onNavigate(screen) })
-        }
-
-        item { CategoryHeader("Customization") }
-        items(listOf(
-            "Scroll Indicators" to Screen.ListWithIndicator,
-            "Advanced Telemetry" to Screen.AdvancedTelemetry,
-            "Custom Labels & Icons" to Screen.ThemedSample,
-            "Custom Control (FAB)" to Screen.CustomControl
         )) { (label, screen) ->
             SampleItem(label, onClick = { onNavigate(screen) })
         }
